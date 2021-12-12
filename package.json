@@ -1,0 +1,36 @@
+{
+  "name": "q-wallet",
+  "version": "1.0.0",
+  "description": "A wallet app for practice",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm run test",
+    "build:ts": "tsc --w",
+    "start": "tsc && ts-node ./dist/src/server.js",
+    "dev:server": "nodemon --watch src -e ts,json  --exec npm run start"
+  },
+  "author": "milz",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/body-parser": "^1.19.2",
+    "@types/express": "^4.17.13",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^16.11.12",
+    "@typescript-eslint/eslint-plugin": "^5.6.0",
+    "@typescript-eslint/parser": "^5.6.0",
+    "eslint": "^8.4.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.3"
+  },
+  "dependencies": {
+    "@types/config": "^0.0.40",
+    "@types/validator": "^13.7.0",
+    "config": "^3.3.6",
+    "express": "^4.17.1",
+    "mongoose": "^6.1.1",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.41"
+  }
+}
