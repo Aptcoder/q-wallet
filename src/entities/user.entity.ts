@@ -1,10 +1,10 @@
 import {
-  Column, Entity, OneToOne, PrimaryGeneratedColumn
+  Column, Entity, OneToOne, PrimaryGeneratedColumn, BaseEntity
 } from 'typeorm';
 import Account from './account.entity';
 
 @Entity()
-export default class User {
+export default class User extends BaseEntity {
   @PrimaryGeneratedColumn()
     id!: number;
 

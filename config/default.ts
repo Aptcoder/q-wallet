@@ -5,5 +5,6 @@ export default {
   dbName: 'q-wallet',
   dbPort: 5342,
   dbPassword: 'wonderful.',
-  dbUsername: 'postgres'
+  dbUsername: 'postgres',
+  jwtSecret: 'eyvryreyiveyvewiwyeyvwwyve'
 };

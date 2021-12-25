@@ -27,5 +27,9 @@
           "extensions": [ ".js", ".ts"]
         }
       }
-    }
+    },
+    "ignorePatterns": 
+    [
+      "src/migrations/**/*.ts"
+    ]
 }

@@ -1,10 +1,10 @@
 import {
-  Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn
+  Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn, BaseEntity
 } from 'typeorm';
 import User from './user.entity';
 
 @Entity()
-export default class Account {
+export default class Account extends BaseEntity {
   @PrimaryGeneratedColumn()
     id!: number;
 
@@ -13,7 +13,11 @@ export default class Account {
     precision: 20,
     scale: 4,
     default: 0,
-    nullable: false
+    nullable: false,
+    transformer: {
+      to: (value) => value,
+      from: (value): number => parseFloat(value)
+    }
   })
     balance!: number;
 

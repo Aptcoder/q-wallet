@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm run test",
     "build:ts": "tsc --w",
+    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
     "start": "tsc && ts-node ./dist/src/server.js",
     "dev:server": "nodemon --watch src -e ts,json  --exec npm run start"
   },
@@ -23,10 +24,14 @@
     "eslint-plugin-import": "^2.25.3"
   },
   "dependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/config": "^0.0.40",
+    "@types/jsonwebtoken": "^8.5.6",
     "@types/validator": "^13.7.0",
+    "bcrypt": "^5.0.1",
     "config": "^3.3.6",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.1",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",

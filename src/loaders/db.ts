@@ -16,7 +16,7 @@ export default (): Promise<void | Connection> => createConnection({
     `${entityPath}/*.js`,
     `${entityPath}/*.ts`
   ],
-  synchronize: true,
+  synchronize: false,
   logging: false
 })
   .then(() => {
