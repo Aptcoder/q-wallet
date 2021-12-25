@@ -24,6 +24,15 @@ export default class UserService {
   }
 
   public async create(userData: UserDataInterface) {
+    const existingUser = await this.userRepo.findOne({
+      where: {
+        email: userData.email
+      }
+    });
+
+    if (existingUser) {
+      throw new ServiceError({ message: 'A user with email address already exists', status: 409 });
+    }
     const hashedPassword = await UserService._hashPassword(userData.password);
     const user = new User();
     user.firstName = userData.firstName;

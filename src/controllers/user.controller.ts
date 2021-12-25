@@ -11,8 +11,7 @@ export default {
         user
       });
     } catch (err) {
-      console.log('err', err);
-      return res.status(500).send(err);
+      return processError(res, err);
     }
   },
 

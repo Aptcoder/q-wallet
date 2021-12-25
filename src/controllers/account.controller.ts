@@ -24,16 +24,6 @@ export default {
       });
     } catch (err: any) {
       return processError(res, err);
-      // let status = 500;
-      // const { message } = err;
-      // if (err.status) {
-      //   status = err.status;
-      // }
-      // return res.status(status).send({
-      //   status: 'failed',
-      //   message,
-      //   data: {}
-      // });
     }
   }
 };

@@ -29,7 +29,11 @@ export default class User extends BaseEntity {
   @Column({
     type: 'varchar',
     unique: true,
-    nullable: false
+    nullable: false,
+    transformer: {
+      to: (value: string) => value.toLocaleLowerCase(),
+      from: (value) => value
+    }
   })
     email!: string;
 

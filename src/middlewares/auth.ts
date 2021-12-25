@@ -8,14 +8,21 @@ interface reqWithUser extends Request {
 
 export function auth(req: reqWithUser, res: Response, next: NextFunction) {
   const token = req.header('x-auth');
-  if (!token) return res.status(403).send('Access Denied. Please supply a token');
+  if (!token) {
+    return res.status(403).send({ message: 'Not allowed. Please supply a token', status: 'failed', data: {} });
+  }
 
   try {
-    const decoded = jwt.verify(token, config.get<string>('jwtsecret'));
+    const decoded = jwt.verify(token, config.get<string>('jwtSecret'));
     req.user = decoded;
     return next();
-  } catch (ex) {
-    return res.status(403).send('Invalid token supplied');
+  } catch (err) {
+    console.log('err', err);
+    return res.status(403).send({
+      message: 'Invalid token supplied',
+      status: 'failed',
+      data: {}
+    });
   }
 }
 
