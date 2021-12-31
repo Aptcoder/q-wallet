@@ -1,4 +1,6 @@
 import { getConnection, EntityManager } from 'typeorm';
+import { randomUUID } from 'crypto';
+import paymentService from '../utils/payment.service';
 import Account from '../entities/account.entity';
 import User from '../entities/user.entity';
 import Transaction, { TransactionType, TransactionCategory } from '../entities/transaction.entity';
@@ -9,6 +11,70 @@ export default class AccountService {
 
   constructor() {
     this.connection = getConnection('q-wallet');
+  }
+
+  public async initiateCardFunding(
+    userEmail: string,
+    card: {
+      cvv: string,
+      card_number: string,
+      expiry_month: string,
+      expiry_year: string
+    },
+    amount: number
+  ) {
+    const user = await this.connection.getRepository(User).findOne({
+      where: {
+        email: userEmail
+      }
+    });
+
+    if (!user) {
+      throw new ServiceError({ status: 404, message: 'User not found ' });
+    }
+
+    const account = await this.connection.getRepository(Account).findOne({
+      where: {
+        user: user.id
+      }
+    });
+
+    if (!account) {
+      throw new ServiceError({ status: 404, message: 'Account not found ' });
+    }
+    const randRef = randomUUID();
+    console.log('trans', randRef);
+    const payload = {
+      ...card,
+      tx_ref: randRef,
+      fullname: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+      amount
+    };
+    const result = await paymentService.initiateCardPayment(payload);
+    if (result.status !== 'success') {
+      throw new ServiceError({ status: 400, message: 'Could not complete card transaction' });
+    }
+
+    const nextStage = result.meta.authorization.mode;
+    if (nextStage !== 'pin') {
+      throw new ServiceError({ status: 400, message: 'Can not charge this card' });
+    }
+    const transaction = new Transaction();
+    transaction.category = TransactionCategory.CARD_FUNDING;
+    transaction.narration = 'CARDFD_';
+    transaction.amount = amount;
+    transaction.balance_before = account.balance;
+    transaction.balance_after = account.balance + Number(amount);
+    transaction.account = account;
+    transaction.type = TransactionType.CREDIT;
+    transaction.meta_data = JSON.stringify({
+      response: result.message
+    });
+    transaction.reference = randRef;
+
+    await this.connection.getRepository(Transaction).save(transaction);
+    return result;
   }
 
   public static async creditAccount(

@@ -6,5 +6,6 @@ const router: Router = Router();
 
 router.post('/transfer', auth, accountController.makeTransfer);
 // router.get('/:userId', userController.getUser);
+router.post('/fund_with_card/initiate', auth, accountController.initiateCardFunding);
 
 export default router;
