@@ -31,7 +31,7 @@ export default {
   async initiateCardFunding(req: reqWithUser, res: Response) {
     try {
       const {
-        amount, cvv, card_number, expiry_month, expiry_year
+        amount, cvv, card_number, expiry_month, expiry_year, pin
       } = req.body;
       const { email: userEmail } = req.user;
       const accountService = new AccountService();
@@ -41,18 +41,39 @@ export default {
           cvv,
           card_number,
           expiry_month,
-          expiry_year
+          expiry_year,
+          pin
         },
         amount
       );
       return res.send({
+        status: 'success',
         message: result.message,
         data: {
-          result
+          status: result.status,
+          ...result.data
         }
       });
     } catch (err: any) {
-      console.log(err);
+      return processError(res, err);
+    }
+  },
+
+  async validateFunding(req: reqWithUser, res: Response) {
+    try {
+      const { otp, transactionReference } = req.body;
+      const { user } = req;
+      const accountService = new AccountService();
+      const result = await accountService.validateFunding(transactionReference, otp, user);
+      return res.send({
+        status: 'success',
+        message: result.message,
+        data: {
+          ...result.data
+        }
+      });
+    } catch (err: any) {
+      console.log('err', err);
       return processError(res, err);
     }
   }

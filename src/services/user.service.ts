@@ -51,7 +51,8 @@ export default class UserService {
     const user = await this.userRepo.findOne({
       where: {
         email: userEmail
-      }
+      },
+      relations: ['account']
     });
 
     if (!user) {
@@ -85,16 +86,18 @@ export default class UserService {
   }
 
   private static async _generateToken(user: User):Promise<{ accessToken: string}> {
+    console.log('user', user);
     const payload = {
       email: user.email,
       id: user.id,
+      accountId: user.account.id,
       firstName: user.firstName,
       lastName: user.lastName
     };
     return new Promise((resolve, reject) => {
       jwt.sign(payload, config.get<string>('jwtSecret'), {
         // expiresIn: '600000'
-        expiresIn: '1800000'
+        expiresIn: '18000000'
       }, (err, token) => {
         if (err) {
           return reject(err);

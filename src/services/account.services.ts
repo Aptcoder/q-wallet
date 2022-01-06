@@ -13,12 +13,66 @@ export default class AccountService {
     this.connection = getConnection('q-wallet');
   }
 
+  private static processCardPaymentResult(result: any) {
+    if (result.status !== 'success') {
+      return {
+        creditAccount: false,
+        success: false,
+        nextAction: 'Could not charge card',
+        status: 'FAILED'
+      };
+    }
+
+    // is the next stage to submit otp;
+    if (result.meta) {
+      const { authorization } = result.meta;
+      const { mode } = authorization;
+      console.log('autho', mode);
+      if (mode === 'otp') {
+        return {
+          creditAccount: false,
+          success: true,
+          nextAction: 'Submit OTP',
+          status: 'SUBMIT_OTP'
+        };
+      }
+      if (mode === 'pin') {
+        return {
+          creditAccount: false,
+          success: true,
+          nextAction: 'Submit PIN',
+          status: 'PIN_REQUIRED'
+        };
+      }
+    }
+
+    if (result.data) {
+      const { status } = result.data;
+      if (status === 'successful') {
+        return {
+          creditAccount: true,
+          success: true,
+          nextAction: 'Credit Account',
+          status: 'COMPLETED'
+        };
+      }
+    }
+
+    return {
+      creditAccount: false,
+      success: false,
+      nextAction: 'Could not charge card',
+      status: 'FAILED'
+    };
+  }
+
   public async initiateCardFunding(
     userEmail: string,
     card: {
       cvv: string,
       card_number: string,
       expiry_month: string,
+      pin: string,
       expiry_year: string
     },
     amount: number
@@ -43,7 +97,6 @@ export default class AccountService {
       throw new ServiceError({ status: 404, message: 'Account not found ' });
     }
     const randRef = randomUUID();
-    console.log('trans', randRef);
     const payload = {
       ...card,
       tx_ref: randRef,
@@ -52,14 +105,18 @@ export default class AccountService {
       amount
     };
     const result = await paymentService.initiateCardPayment(payload);
-    if (result.status !== 'success') {
-      throw new ServiceError({ status: 400, message: 'Could not complete card transaction' });
+    const processedResult = AccountService.processCardPaymentResult(result);
+    if (!processedResult.success) {
+      throw new ServiceError({ status: 400, message: processedResult.nextAction as string });
     }
 
-    const nextStage = result.meta.authorization.mode;
-    if (nextStage !== 'pin') {
-      throw new ServiceError({ status: 400, message: 'Can not charge this card' });
+    if (processedResult.nextAction === 'Submit PIN') {
+      return {
+        message: 'Submit card pin to continue',
+        status: processedResult.status
+      };
     }
+
     const transaction = new Transaction();
     transaction.category = TransactionCategory.CARD_FUNDING;
     transaction.narration = 'CARDFD_';
@@ -72,16 +129,56 @@ export default class AccountService {
       response: result.message
     });
     transaction.reference = randRef;
+    transaction.ext_reference = (result.data ? result.data.flw_ref : null) as string;
+    transaction.last_ext_response = (result.data ? result.data.status : 'pending') as string;
 
     await this.connection.getRepository(Transaction).save(transaction);
-    return result;
+
+    return {
+      message: processedResult.nextAction,
+      status: processedResult.status,
+      data: {
+        transaction
+      }
+    };
+  }
+
+  public async validateFunding(txRef: string, otp: string, user: any) {
+    const { accountId } = user;
+    const transaction = await this.connection.getRepository(Transaction).findOne({
+      where: {
+        reference: txRef,
+        account: accountId
+      }
+    });
+
+    if (!transaction) {
+      throw new ServiceError({ status: 404, message: 'Transaction not found ' });
+    }
+    const result = await paymentService.validateCharge(transaction.ext_reference, otp);
+    if (result.status !== 'success') {
+      throw new ServiceError({ status: 400, message: 'Could not validate charge' });
+    }
+
+    await this.connection.getRepository(Transaction).update({
+      reference: transaction.reference
+    }, {
+      last_ext_response: result.data.status as string
+    });
+
+    return {
+      message: 'Charge completed',
+      data: {
+        transaction
+      }
+    };
   }
 
   public static async creditAccount(
     account: Account,
     creditAmount: number,
-    transactionDetails: { narration: string, category: TransactionCategory },
-    manager: EntityManager
+    manager: EntityManager,
+    transactionDetails: { narration: string, category: TransactionCategory }
   ) {
     const transaction = new Transaction();
     transaction.amount = creditAmount;
@@ -94,7 +191,7 @@ export default class AccountService {
     transaction.meta_data = transaction.narration;
 
     await manager.save(Transaction, transaction);
-    console.log('transacgion cre', transaction);
+
     await manager.update(
       Account,
       { id: account.id },
@@ -175,8 +272,8 @@ export default class AccountService {
       await AccountService.creditAccount(
 creditAccount as Account,
 amount,
+manager,
 transactionDetails,
-manager
       );
       await AccountService.debitAccount(
 debitAccount as Account,

@@ -3,3 +3,4 @@
 default.ts
 default.js
 /config/default.ts
+.env

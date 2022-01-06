@@ -1,6 +1,11 @@
-import express, { Application } from 'express';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import express, {
+  Application, NextFunction, Request, Response
+} from 'express';
 import userRouter from './routes/user.routes';
 import accountRouter from './routes/account.routes';
+import paymenthook from './paymenthook';
 import 'reflect-metadata';
 import initDb from './loaders/db';
 
@@ -12,5 +17,13 @@ app.use(express.json());
 
 app.use('/users', userRouter);
 app.use('/accounts', accountRouter);
+app.post('/payment-hook', paymenthook);
 
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.log('err', err);
+  res.status(err.status || 500).send({
+    status: 'failed',
+    message: 'Something unexpected happened'
+  });
+});
 export default app;

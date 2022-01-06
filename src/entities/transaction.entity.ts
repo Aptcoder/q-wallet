@@ -29,6 +29,16 @@ export default class Transaction extends BaseEntity {
     type!: TransactionType;
 
   @Column({
+    nullable: true
+  })
+    ext_reference!: string;
+
+  @Column({
+    nullable: true
+  })
+    last_ext_response!: string;
+
+  @Column({
     type: 'enum',
     enum: TransactionCategory,
   })

@@ -4,6 +4,31 @@ import forge from 'node-forge';
 import config from 'config';
 // type paymentProvider = 'FLUTTERWAVE'
 
+type statusType = 'success' |'error'
+
+const processPaymentServErrorr = (err: any) => {
+  let status: statusType = 'error';
+  let data = {};
+  let { message } = err;
+  if (err.response) {
+    data = err.response.data;
+    message = err.response.message;
+    status = err.response.status;
+  }
+
+  return {
+    status,
+    data,
+    message
+  };
+};
+
+interface ResponseData {
+  status: statusType,
+  message: string,
+  data: Record<string, string | object | number >,
+  meta?: Record<string, string | object | number >,
+}
 class PaymentService {
   private client;
 
@@ -29,7 +54,6 @@ class PaymentService {
   }
 
   private encryptPayload(payload: string) {
-    console.log('pay', payload);
     const cipher = forge.cipher.createCipher(
       '3DES-ECB',
       forge.util.createBuffer(this.ENCRYPTION_KEY)
@@ -42,7 +66,6 @@ class PaymentService {
     return forge.util.encode64(encrypted.getBytes());
   }
 
-  // eslint-disable-next-line no-dupe-args
   public async initiateCardPayment(payload: { tx_ref: string,
       amount: number,
       card_number: string,
@@ -50,20 +73,41 @@ class PaymentService {
       expiry_month: string,
       expiry_year: string,
       email?: string,
-      fullname?: string }) {
+      pin?: string,
+      fullname?: string }): Promise<ResponseData> {
     const fw_payload = {
       ...payload,
       currency: 'NGN',
-      amount: String(payload.amount)
+      amount: String(payload.amount),
+      authorization: {}
     };
 
+    if (payload.pin) {
+      fw_payload.authorization = {
+        mode: 'pin',
+        pin: payload.pin
+      };
+    }
+
     const encrypted_payload = this.encryptPayload(JSON.stringify(fw_payload));
-    console.log('encr', encrypted_payload);
     const response = await this.client.post('/charges?type=card', {
       client: encrypted_payload
     });
-    // console.log('result', response);
     return response.data;
+  }
+
+  public async validateCharge(flw_ref: string, otp: string, charge_type = 'card'): Promise<ResponseData> {
+    try {
+      const result = await this.client.post('/validate-charge', {
+        otp,
+        flw_ref,
+        type: charge_type
+      });
+      console.log('res', result.data);
+      return result.data;
+    } catch (err) {
+      return processPaymentServErrorr(err);
+    }
   }
 }
 
