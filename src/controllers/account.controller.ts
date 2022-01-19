@@ -5,6 +5,23 @@ import { processError } from '../utils/helpers';
 import { reqWithUser } from '../utils/types';
 
 export default {
+  async getBalance(req: reqWithUser, res: Response): Promise<void | Response> {
+    try {
+      const { email: userEmail } = req.user;
+      const accountService = new AccountService();
+      const balance = await accountService.getBalance(userEmail);
+      return res.send({
+        message: 'Balance',
+        status: 'success',
+        data: {
+          balance
+        }
+      });
+    } catch (err: any) {
+      return processError(res, err);
+    }
+  },
+
   async makeTransfer(req: reqWithUser, res: Response): Promise<void | Response> {
     try {
       const { email, amount } = req.body;

@@ -8,10 +8,15 @@
       "type": "pwa-node",
       "request": "launch",
       "name": "Launch Program",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
       "skipFiles": [
-        "<node_internals>/**"
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*.ts"
       ],
-      "program": "${workspaceFolder}\\src\\controllers\\user.controller.ts",
+      // "program": "${workspaceFolder}\\src\\server.ts",
       "outFiles": [
         "${workspaceFolder}/**/*.js"
       ]

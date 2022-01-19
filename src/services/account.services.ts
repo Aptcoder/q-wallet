@@ -66,6 +66,23 @@ export default class AccountService {
     };
   }
 
+  public async getBalance(
+    userEmail: string
+  ) {
+    const user = await this.connection.getRepository(User).findOne({
+      where: {
+        email: userEmail
+      },
+      select: ['account', 'phoneNumber', 'firstName', 'lastName', 'id', 'email'],
+      relations: ['account']
+    });
+    if (!user) {
+      throw new ServiceError({ message: 'User not found', status: 404 });
+    }
+
+    return user.account.balance;
+  }
+
   public async initiateCardFunding(
     userEmail: string,
     card: {
@@ -149,7 +166,8 @@ export default class AccountService {
       where: {
         reference: txRef,
         account: accountId
-      }
+      },
+      relations: ['account']
     });
 
     if (!transaction) {
@@ -166,6 +184,20 @@ export default class AccountService {
       last_ext_response: result.data.status as string
     });
 
+    await this.connection.transaction(async (manager) => {
+      await manager.update(Transaction, {
+        reference: transaction.reference
+      }, {
+        last_ext_response: result.data.status as string
+      });
+
+      await AccountService.creditAccount(
+        transaction.account,
+        transaction.amount,
+        manager
+      );
+    });
+
     return {
       message: 'Charge completed',
       data: {
@@ -178,25 +210,27 @@ export default class AccountService {
     account: Account,
     creditAmount: number,
     manager: EntityManager,
-    transactionDetails: { narration: string, category: TransactionCategory }
+    transactionDetails: { narration: string, category: TransactionCategory } | undefined = undefined
   ) {
-    const transaction = new Transaction();
-    transaction.amount = creditAmount;
-    transaction.type = TransactionType.CREDIT;
-    transaction.category = transactionDetails.category;
-    transaction.account = account;
-    transaction.balance_after = account.balance + creditAmount;
-    transaction.balance_before = account.balance;
-    transaction.narration = transactionDetails.narration;
-    transaction.meta_data = transaction.narration;
+    if (transactionDetails) {
+      const transaction = new Transaction();
+      transaction.amount = creditAmount;
+      transaction.type = TransactionType.CREDIT;
+      transaction.category = transactionDetails.category;
+      transaction.account = account;
+      transaction.balance_after = account.balance + creditAmount;
+      transaction.balance_before = account.balance;
+      transaction.narration = transactionDetails.narration;
+      transaction.meta_data = transaction.narration;
 
-    await manager.save(Transaction, transaction);
+      await manager.save(Transaction, transaction);
+    }
 
     await manager.update(
       Account,
       { id: account.id },
       {
-        balance: account.balance + creditAmount
+        balance: account.balance + Number(creditAmount)
       }
     );
   }

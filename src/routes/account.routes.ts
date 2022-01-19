@@ -2,11 +2,11 @@ import { Router } from 'express';
 import accountController from '../controllers/account.controller';
 import { auth } from '../middlewares/auth';
 
-const router: Router = Router();
+export const accountsRouter: Router = Router();
+export const accountRouter: Router = Router();
 
-router.post('/transfer', auth, accountController.makeTransfer);
+accountRouter.post('/transfer', auth, accountController.makeTransfer);
+accountRouter.get('/balance', auth, accountController.getBalance);
 // router.get('/:userId', userController.getUser);
-router.post('/fund_with_card', auth, accountController.initiateCardFunding);
-router.post('/fund_with_card/validate', auth, accountController.validateFunding);
-
-export default router;
+accountRouter.post('/fund', auth, accountController.initiateCardFunding);
+accountRouter.post('/fund/validate', auth, accountController.validateFunding);

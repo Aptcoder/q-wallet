@@ -3,6 +3,7 @@
 import { getConnection } from 'typeorm';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import _ from 'lodash';
 import config from 'config';
 import ServiceError from '../utils/service.error';
 import User from '../entities/user.entity';
@@ -52,6 +53,7 @@ export default class UserService {
       where: {
         email: userEmail
       },
+      select: ['firstName', 'lastName', 'id', 'email', 'account', 'password', 'phoneNumber'],
       relations: ['account']
     });
 
@@ -65,7 +67,9 @@ export default class UserService {
     }
 
     const { accessToken } = await UserService._generateToken(user);
-    return { accessToken, user };
+
+    const userWithoutPasssword = _.omit(user, 'password');
+    return { accessToken, user: userWithoutPasssword };
   }
 
   public async getUser(userId: string) {
