@@ -1,5 +1,6 @@
 import { getConnection, EntityManager } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { IAccountRepository } from 'src/utils/interfaces/repos.interfaces';
 import paymentService from '../utils/payment.service';
 import Account from '../entities/account.entity';
 import User from '../entities/user.entity';
@@ -7,10 +8,8 @@ import Transaction, { TransactionType, TransactionCategory } from '../entities/t
 import ServiceError from '../utils/service.error';
 
 export default class AccountService {
-  private connection;
-
-  constructor() {
-    this.connection = getConnection('q-wallet');
+  constructor(private accountsRepository: IAccountRepository) {
+    this.accountsRepository = accountsRepository;
   }
 
   private static processCardPaymentResult(result: any) {
@@ -67,149 +66,145 @@ export default class AccountService {
   }
 
   public async getBalance(
-    userEmail: string
+    userId: string
   ) {
-    const user = await this.connection.getRepository(User).findOne({
+    const account = await this.accountsRepository.findOne({
       where: {
-        email: userEmail
+        userId
       },
-      select: ['account', 'phoneNumber', 'firstName', 'lastName', 'id', 'email'],
-      relations: ['account']
     });
-    if (!user) {
-      throw new ServiceError({ message: 'User not found', status: 404 });
-    }
-
-    return user.account.balance;
-  }
-
-  public async initiateCardFunding(
-    userEmail: string,
-    card: {
-      cvv: string,
-      card_number: string,
-      expiry_month: string,
-      pin: string,
-      expiry_year: string
-    },
-    amount: number
-  ) {
-    const user = await this.connection.getRepository(User).findOne({
-      where: {
-        email: userEmail
-      }
-    });
-
-    if (!user) {
-      throw new ServiceError({ status: 404, message: 'User not found ' });
-    }
-
-    const account = await this.connection.getRepository(Account).findOne({
-      where: {
-        user: user.id
-      }
-    });
-
     if (!account) {
-      throw new ServiceError({ status: 404, message: 'Account not found ' });
+      throw new ServiceError({ message: 'Account not found', status: 404 });
     }
-    const randRef = randomUUID();
-    const payload = {
-      ...card,
-      tx_ref: randRef,
-      fullname: `${user.firstName} ${user.lastName}`,
-      email: user.email,
-      amount
-    };
-    const result = await paymentService.initiateCardPayment(payload);
-    const processedResult = AccountService.processCardPaymentResult(result);
-    if (!processedResult.success) {
-      throw new ServiceError({ status: 400, message: processedResult.nextAction as string });
-    }
-
-    if (processedResult.nextAction === 'Submit PIN') {
-      return {
-        message: 'Submit card pin to continue',
-        status: processedResult.status
-      };
-    }
-
-    const transaction = new Transaction();
-    transaction.category = TransactionCategory.CARD_FUNDING;
-    transaction.narration = 'CARDFD_';
-    transaction.amount = amount;
-    transaction.balance_before = account.balance;
-    transaction.balance_after = account.balance + Number(amount);
-    transaction.account = account;
-    transaction.type = TransactionType.CREDIT;
-    transaction.meta_data = JSON.stringify({
-      response: result.message
-    });
-    transaction.reference = randRef;
-    transaction.ext_reference = (result.data ? result.data.flw_ref : null) as string;
-    transaction.last_ext_response = (result.data ? result.data.status : 'pending') as string;
-
-    await this.connection.getRepository(Transaction).save(transaction);
-
-    return {
-      message: processedResult.nextAction,
-      status: processedResult.status,
-      data: {
-        transaction
-      }
-    };
+    return account.balance;
   }
 
-  public async validateFunding(txRef: string, otp: string, user: any) {
-    const { accountId } = user;
-    const transaction = await this.connection.getRepository(Transaction).findOne({
-      where: {
-        reference: txRef,
-        account: accountId
-      },
-      relations: ['account']
-    });
+  // public async initiateCardFunding(
+  //   userEmail: string,
+  //   card: {
+  //     cvv: string,
+  //     card_number: string,
+  //     expiry_month: string,
+  //     pin: string,
+  //     expiry_year: string
+  //   },
+  //   amount: number
+  // ) {
+  //   const user = await this.connection.getRepository(User).findOne({
+  //     where: {
+  //       email: userEmail
+  //     }
+  //   });
 
-    if (!transaction) {
-      throw new ServiceError({ status: 404, message: 'Transaction not found ' });
-    }
-    const result = await paymentService.validateCharge(transaction.ext_reference, otp);
-    if (result.status !== 'success') {
-      throw new ServiceError({ status: 400, message: 'Could not validate charge' });
-    }
+  //   if (!user) {
+  //     throw new ServiceError({ status: 404, message: 'User not found ' });
+  //   }
 
-    await this.connection.getRepository(Transaction).update({
-      reference: transaction.reference
-    }, {
-      last_ext_response: result.data.status as string
-    });
+  //   const account = await this.connection.getRepository(Account).findOne({
+  //     where: {
+  //       user: user.id
+  //     }
+  //   });
 
-    await this.connection.transaction(async (manager) => {
-      await manager.update(Transaction, {
-        reference: transaction.reference
-      }, {
-        last_ext_response: result.data.status as string
-      });
+  //   if (!account) {
+  //     throw new ServiceError({ status: 404, message: 'Account not found ' });
+  //   }
+  //   const randRef = randomUUID();
+  //   const payload = {
+  //     ...card,
+  //     tx_ref: randRef,
+  //     fullname: `${user.firstName} ${user.lastName}`,
+  //     email: user.email,
+  //     amount
+  //   };
+  //   const result = await paymentService.initiateCardPayment(payload);
+  //   const processedResult = AccountService.processCardPaymentResult(result);
+  //   if (!processedResult.success) {
+  //     throw new ServiceError({ status: 400, message: processedResult.nextAction as string });
+  //   }
 
-      await AccountService.creditAccount(
-        transaction.account,
-        transaction.amount,
-        manager
-      );
-    });
+  //   if (processedResult.nextAction === 'Submit PIN') {
+  //     return {
+  //       message: 'Submit card pin to continue',
+  //       status: processedResult.status
+  //     };
+  //   }
 
-    return {
-      message: 'Charge completed',
-      data: {
-        transaction
-      }
-    };
-  }
+  //   const transaction = new Transaction();
+  //   transaction.category = TransactionCategory.CARD_FUNDING;
+  //   transaction.narration = 'CARDFD_';
+  //   transaction.amount = amount;
+  //   transaction.balance_before = account.balance;
+  //   transaction.balance_after = account.balance + Number(amount);
+  //   transaction.account = account;
+  //   transaction.type = TransactionType.CREDIT;
+  //   transaction.meta_data = JSON.stringify({
+  //     response: result.message
+  //   });
+  //   transaction.reference = randRef;
+  //   transaction.ext_reference = (result.data ? result.data.flw_ref : null) as string;
+  //   transaction.last_ext_response = (result.data ? result.data.status : 'pending') as string;
+
+  //   await this.connection.getRepository(Transaction).save(transaction);
+
+  //   return {
+  //     message: processedResult.nextAction,
+  //     status: processedResult.status,
+  //     data: {
+  //       transaction
+  //     }
+  //   };
+  // }
+
+  // public async validateFunding(txRef: string, otp: string, user: any) {
+  //   const { accountId } = user;
+  //   const transaction = await this.connection.getRepository(Transaction).findOne({
+  //     where: {
+  //       reference: txRef,
+  //       account: accountId
+  //     },
+  //     relations: ['account']
+  //   });
+
+  //   if (!transaction) {
+  //     throw new ServiceError({ status: 404, message: 'Transaction not found ' });
+  //   }
+  //   const result = await paymentService.validateCharge(transaction.ext_reference, otp);
+  //   if (result.status !== 'success') {
+  //     throw new ServiceError({ status: 400, message: 'Could not validate charge' });
+  //   }
+
+  //   await this.connection.getRepository(Transaction).update({
+  //     reference: transaction.reference
+  //   }, {
+  //     last_ext_response: result.data.status as string
+  //   });
+
+  //   await this.connection.transaction(async (manager) => {
+  //     await manager.update(Transaction, {
+  //       reference: transaction.reference
+  //     }, {
+  //       last_ext_response: result.data.status as string
+  //     });
+
+  //     await AccountService.creditAccount(
+  //       transaction.account,
+  //       transaction.amount,
+  //       manager
+  //     );
+  //   });
+
+  //   return {
+  //     message: 'Charge completed',
+  //     data: {
+  //       transaction
+  //     }
+  //   };
+  // }
 
   public static async creditAccount(
     account: Account,
     creditAmount: number,
-    manager: EntityManager,
     transactionDetails: { narration: string, category: TransactionCategory } | undefined = undefined
   ) {
     if (transactionDetails) {
