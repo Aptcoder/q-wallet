@@ -31,7 +31,7 @@ export default class User extends BaseEntity {
     unique: true,
     nullable: false,
     transformer: {
-      to: (value: string) => value.toLocaleLowerCase(),
+      to: (value: string) => value.toLowerCase(),
       from: (value) => value
     }
   })

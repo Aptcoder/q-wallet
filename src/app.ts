@@ -3,22 +3,20 @@
 import express, {
   Application, NextFunction, Request, Response
 } from 'express';
-import userRouter from './routes/user.routes';
-import { accountRouter, accountsRouter } from './routes/account.routes';
 import paymenthook from './paymenthook';
 import 'reflect-metadata';
 import initDb from './loaders/db';
-
 initDb();
+
+console.log('here')
+import apiRouter from './routes/api/api.routes';
 
 const app: Application = express();
 
 app.use(express.json());
 
-app.use('/users', userRouter);
-app.use('/accounts', accountsRouter);
-app.use('/account', accountRouter);
-app.post('/payment-hook', paymenthook);
+app.use('/api', apiRouter)
+
 
 app.use('*', (req, res) => res.send({
   status: 'failed',

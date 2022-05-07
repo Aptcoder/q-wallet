@@ -9,7 +9,7 @@ export default {
   database: config.get<string>('dbName'),
   logging: false,
   entities: [
-    'src/entities/**/*.ts'
+    'src/entities/**/*.{js,ts}'
   ],
   migrations: [
     'src/migrations/**/*.ts'

@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default {
-  port: 7000,
+  port: 3000,
   dbUri: 'postgresql://postgres:wonderful.@localhost:5432/q-wallet',
   dbHost: 'localhost',
   dbName: 'q-wallet',

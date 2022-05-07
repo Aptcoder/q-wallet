@@ -13,16 +13,16 @@ export default (): Promise<void | Connection> => createConnection({
   password: config.get<string>('dbPassword'),
   database: config.get<string>('dbName'),
   entities: [
-    `${entityPath}/*.js`,
-    `${entityPath}/*.ts`
+    `${entityPath}/*.{js,ts}`,
   ],
   synchronize: false,
-  logging: false
+  logging: true,
 })
-  .then(() => {
+  .then((connection) => {
     console.log('Sucessfully connected to db');
   })
   .catch((err) => {
     console.log('Could not connect to db', err);
     process.exit();
   });
+
