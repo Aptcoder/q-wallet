@@ -21,24 +21,24 @@ export default (userService: IUserService) =>  ({
     } catch (err) {
       return processError(res, err);
     }
-  }
+  },
 
-  // async authUser(req: Request, res: Response): Promise<void | Response > {
-  //   try {
-  //     const { email, password } = req.body;
-  //     const { accessToken, user } = await this.usersService.auth({ email, password });
-  //     return res.send({
-  //       status: 'success',
-  //       message: 'User auth successful',
-  //       data: {
-  //         token: accessToken,
-  //         user
-  //       }
-  //     });
-  //   } catch (err) {
-  //     return processError(res, err);
-  //   }
-  // }
+  async authUser(req: Request, res: Response): Promise<void | Response > {
+    try {
+      const { email, password } = req.body;
+      const { accessToken, user } = await userService.auth({ email, password });
+      return res.send({
+        status: 'success',
+        message: 'User auth successful',
+        data: {
+          token: accessToken,
+          user
+        }
+      });
+    } catch (err) {
+      return processError(res, err);
+    }
+  }
 
   // async getUser(req: Request, res: Response): Promise<void | Response> {
   //   try {

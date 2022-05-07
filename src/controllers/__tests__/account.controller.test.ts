@@ -1,13 +1,9 @@
 import { reqWithUser } from "src/utils/types"
-import { IAccountService } from "../utils/interfaces/services.interfaces"
-import AccountController from "./account.controller"
+import { IAccountService } from "../../utils/interfaces/services.interfaces"
+import AccountController from "../account.controller"
 import { Response } from 'express'
 
 describe('Account controller', () => {
-    it('A + B', () => {
-        expect(1 + 1).toBe(2)
-    })
-
     const mockAccountService: IAccountService = {
         getBalance(email: string){
             return Promise.resolve(2)
