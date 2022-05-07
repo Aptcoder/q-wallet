@@ -6,3 +6,7 @@ export interface IUserService {
   // auth(authUserDto: AuthUserDto): any,
   // getOne(userId: string): any
 }
+
+export interface IAccountService {
+  getBalance(email: string): Promise<number>
+}
