@@ -1,6 +1,8 @@
+
 import Account from "../../entities/account.entity";
+import Transaction from "../../entities/transaction.entity";
 import { NotFoundError } from "../../utils/errors";
-import { IAccountRepository } from "../../utils/interfaces/repos.interfaces"
+import { IAccountRepository, ITransactionRepository } from "../../utils/interfaces/repos.interfaces"
 import { IAccountService } from "../../utils/interfaces/services.interfaces";
 import AccountService from "../account.services";
 
@@ -17,11 +19,24 @@ describe('Account service', () => {
         findOne({}){
             return Promise.resolve(account)
         },
-        update({}){}
+        update({}){},
+        findByUserId(userId: string){
+            return Promise.resolve(undefined)
+        },
+        updateBalance(account, amount, inc): Promise<Account>{
+            return Promise.resolve(account)
+        }
+    }
+
+    const transaction = new Transaction()
+    const mockTransactionRepository: ITransactionRepository = {
+        createAndSave({}){
+            return Promise.resolve(transaction)
+        }
     }
 
     beforeEach(() => {
-        accountService = new AccountService(mockAccountRepository)
+        accountService = new AccountService(mockAccountRepository, mockTransactionRepository)
     })
 
     it('Should get balance fromm repo', async () => {

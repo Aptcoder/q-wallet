@@ -1,321 +1,335 @@
-import { getConnection, EntityManager } from 'typeorm';
-import { randomUUID } from 'crypto';
-import { IAccountRepository } from 'src/utils/interfaces/repos.interfaces';
-import paymentService from '../utils/payment.service';
-import Account from '../entities/account.entity';
-import User from '../entities/user.entity';
-import Transaction, { TransactionType, TransactionCategory } from '../entities/transaction.entity';
-import ServiceError from '../utils/service.error';
-import { IAccountService } from '../utils/interfaces/services.interfaces';
-import { NotFoundError } from '../utils/errors';
+import { getConnection, EntityManager } from 'typeorm'
+import { randomUUID } from 'crypto'
+import {
+    IAccountRepository,
+    ITransactionRepository,
+} from 'src/utils/interfaces/repos.interfaces'
+import paymentService from '../utils/payment.service'
+import Account from '../entities/account.entity'
+import User from '../entities/user.entity'
+import Transaction, {
+    TransactionType,
+    TransactionCategory,
+} from '../entities/transaction.entity'
+import ServiceError from '../utils/service.error'
+import { IAccountService } from '../utils/interfaces/services.interfaces'
+import { APIError, ConflictError, NotFoundError } from '../utils/errors'
+import AccountRepository from '../repositories/account.repository'
 
 export default class AccountService implements IAccountService {
-  constructor(private accountsRepository: IAccountRepository) {
-    this.accountsRepository = accountsRepository;
-  }
-
-  // private static processCardPaymentResult(result: any) {
-  //   if (result.status !== 'success') {
-  //     return {
-  //       creditAccount: false,
-  //       success: false,
-  //       nextAction: 'Could not charge card',
-  //       status: 'FAILED'
-  //     };
-  //   }
-
-  //   // is the next stage to submit otp;
-  //   if (result.meta) {
-  //     const { authorization } = result.meta;
-  //     const { mode } = authorization;
-  //     console.log('autho', mode);
-  //     if (mode === 'otp') {
-  //       return {
-  //         creditAccount: false,
-  //         success: true,
-  //         nextAction: 'Submit OTP',
-  //         status: 'SUBMIT_OTP'
-  //       };
-  //     }
-  //     if (mode === 'pin') {
-  //       return {
-  //         creditAccount: false,
-  //         success: true,
-  //         nextAction: 'Submit PIN',
-  //         status: 'PIN_REQUIRED'
-  //       };
-  //     }
-  //   }
-
-  //   if (result.data) {
-  //     const { status } = result.data;
-  //     if (status === 'successful') {
-  //       return {
-  //         creditAccount: true,
-  //         success: true,
-  //         nextAction: 'Credit Account',
-  //         status: 'COMPLETED'
-  //       };
-  //     }
-  //   }
-
-  //   return {
-  //     creditAccount: false,
-  //     success: false,
-  //     nextAction: 'Could not charge card',
-  //     status: 'FAILED'
-  //   };
-  // }
-
-  public async getBalance(
-    userId: string
-  ) {
-    const account: Account | undefined = await this.accountsRepository.findOne({
-      where: {
-        userId
-      },
-    });
-    if (!account) {
-      throw new NotFoundError('Account not found');
+    constructor(
+        private accountRepository: IAccountRepository,
+        private transactionRepository: ITransactionRepository
+    ) {
+        this.accountRepository = accountRepository
+        this.transactionRepository = transactionRepository
     }
-    return account.balance;
-  }
 
-  // public async initiateCardFunding(
-  //   userEmail: string,
-  //   card: {
-  //     cvv: string,
-  //     card_number: string,
-  //     expiry_month: string,
-  //     pin: string,
-  //     expiry_year: string
-  //   },
-  //   amount: number
-  // ) {
-  //   const user = await this.connection.getRepository(User).findOne({
-  //     where: {
-  //       email: userEmail
-  //     }
-  //   });
+    // private static processCardPaymentResult(result: any) {
+    //   if (result.status !== 'success') {
+    //     return {
+    //       creditAccount: false,
+    //       success: false,
+    //       nextAction: 'Could not charge card',
+    //       status: 'FAILED'
+    //     };
+    //   }
 
-  //   if (!user) {
-  //     throw new ServiceError({ status: 404, message: 'User not found ' });
-  //   }
+    //   // is the next stage to submit otp;
+    //   if (result.meta) {
+    //     const { authorization } = result.meta;
+    //     const { mode } = authorization;
+    //     console.log('autho', mode);
+    //     if (mode === 'otp') {
+    //       return {
+    //         creditAccount: false,
+    //         success: true,
+    //         nextAction: 'Submit OTP',
+    //         status: 'SUBMIT_OTP'
+    //       };
+    //     }
+    //     if (mode === 'pin') {
+    //       return {
+    //         creditAccount: false,
+    //         success: true,
+    //         nextAction: 'Submit PIN',
+    //         status: 'PIN_REQUIRED'
+    //       };
+    //     }
+    //   }
 
-  //   const account = await this.connection.getRepository(Account).findOne({
-  //     where: {
-  //       user: user.id
-  //     }
-  //   });
+    //   if (result.data) {
+    //     const { status } = result.data;
+    //     if (status === 'successful') {
+    //       return {
+    //         creditAccount: true,
+    //         success: true,
+    //         nextAction: 'Credit Account',
+    //         status: 'COMPLETED'
+    //       };
+    //     }
+    //   }
 
-  //   if (!account) {
-  //     throw new ServiceError({ status: 404, message: 'Account not found ' });
-  //   }
-  //   const randRef = randomUUID();
-  //   const payload = {
-  //     ...card,
-  //     tx_ref: randRef,
-  //     fullname: `${user.firstName} ${user.lastName}`,
-  //     email: user.email,
-  //     amount
-  //   };
-  //   const result = await paymentService.initiateCardPayment(payload);
-  //   const processedResult = AccountService.processCardPaymentResult(result);
-  //   if (!processedResult.success) {
-  //     throw new ServiceError({ status: 400, message: processedResult.nextAction as string });
-  //   }
+    //   return {
+    //     creditAccount: false,
+    //     success: false,
+    //     nextAction: 'Could not charge card',
+    //     status: 'FAILED'
+    //   };
+    // }
 
-  //   if (processedResult.nextAction === 'Submit PIN') {
-  //     return {
-  //       message: 'Submit card pin to continue',
-  //       status: processedResult.status
-  //     };
-  //   }
+    public async getBalance(userId: string) {
+        const account: Account | undefined =
+            await this.accountRepository.findOne({
+                where: {
+                    userId,
+                },
+            })
+        if (!account) {
+            throw new NotFoundError('Account not found')
+        }
+        return account.balance
+    }
 
-  //   const transaction = new Transaction();
-  //   transaction.category = TransactionCategory.CARD_FUNDING;
-  //   transaction.narration = 'CARDFD_';
-  //   transaction.amount = amount;
-  //   transaction.balance_before = account.balance;
-  //   transaction.balance_after = account.balance + Number(amount);
-  //   transaction.account = account;
-  //   transaction.type = TransactionType.CREDIT;
-  //   transaction.meta_data = JSON.stringify({
-  //     response: result.message
-  //   });
-  //   transaction.reference = randRef;
-  //   transaction.ext_reference = (result.data ? result.data.flw_ref : null) as string;
-  //   transaction.last_ext_response = (result.data ? result.data.status : 'pending') as string;
+    // public async initiateCardFunding(
+    //   userEmail: string,
+    //   card: {
+    //     cvv: string,
+    //     card_number: string,
+    //     expiry_month: string,
+    //     pin: string,
+    //     expiry_year: string
+    //   },
+    //   amount: number
+    // ) {
+    //   const user = await this.connection.getRepository(User).findOne({
+    //     where: {
+    //       email: userEmail
+    //     }
+    //   });
 
-  //   await this.connection.getRepository(Transaction).save(transaction);
+    //   if (!user) {
+    //     throw new ServiceError({ status: 404, message: 'User not found ' });
+    //   }
 
-  //   return {
-  //     message: processedResult.nextAction,
-  //     status: processedResult.status,
-  //     data: {
-  //       transaction
-  //     }
-  //   };
-  // }
+    //   const account = await this.connection.getRepository(Account).findOne({
+    //     where: {
+    //       user: user.id
+    //     }
+    //   });
 
-  // public async validateFunding(txRef: string, otp: string, user: any) {
-  //   const { accountId } = user;
-  //   const transaction = await this.connection.getRepository(Transaction).findOne({
-  //     where: {
-  //       reference: txRef,
-  //       account: accountId
-  //     },
-  //     relations: ['account']
-  //   });
+    //   if (!account) {
+    //     throw new ServiceError({ status: 404, message: 'Account not found ' });
+    //   }
+    //   const randRef = randomUUID();
+    //   const payload = {
+    //     ...card,
+    //     tx_ref: randRef,
+    //     fullname: `${user.firstName} ${user.lastName}`,
+    //     email: user.email,
+    //     amount
+    //   };
+    //   const result = await paymentService.initiateCardPayment(payload);
+    //   const processedResult = AccountService.processCardPaymentResult(result);
+    //   if (!processedResult.success) {
+    //     throw new ServiceError({ status: 400, message: processedResult.nextAction as string });
+    //   }
 
-  //   if (!transaction) {
-  //     throw new ServiceError({ status: 404, message: 'Transaction not found ' });
-  //   }
-  //   const result = await paymentService.validateCharge(transaction.ext_reference, otp);
-  //   if (result.status !== 'success') {
-  //     throw new ServiceError({ status: 400, message: 'Could not validate charge' });
-  //   }
+    //   if (processedResult.nextAction === 'Submit PIN') {
+    //     return {
+    //       message: 'Submit card pin to continue',
+    //       status: processedResult.status
+    //     };
+    //   }
 
-  //   await this.connection.getRepository(Transaction).update({
-  //     reference: transaction.reference
-  //   }, {
-  //     last_ext_response: result.data.status as string
-  //   });
+    //   const transaction = new Transaction();
+    //   transaction.category = TransactionCategory.CARD_FUNDING;
+    //   transaction.narration = 'CARDFD_';
+    //   transaction.amount = amount;
+    //   transaction.balance_before = account.balance;
+    //   transaction.balance_after = account.balance + Number(amount);
+    //   transaction.account = account;
+    //   transaction.type = TransactionType.CREDIT;
+    //   transaction.meta_data = JSON.stringify({
+    //     response: result.message
+    //   });
+    //   transaction.reference = randRef;
+    //   transaction.ext_reference = (result.data ? result.data.flw_ref : null) as string;
+    //   transaction.last_ext_response = (result.data ? result.data.status : 'pending') as string;
 
-  //   await this.connection.transaction(async (manager) => {
-  //     await manager.update(Transaction, {
-  //       reference: transaction.reference
-  //     }, {
-  //       last_ext_response: result.data.status as string
-  //     });
+    //   await this.connection.getRepository(Transaction).save(transaction);
 
-  //     await AccountService.creditAccount(
-  //       transaction.account,
-  //       transaction.amount,
-  //       manager
-  //     );
-  //   });
+    //   return {
+    //     message: processedResult.nextAction,
+    //     status: processedResult.status,
+    //     data: {
+    //       transaction
+    //     }
+    //   };
+    // }
 
-  //   return {
-  //     message: 'Charge completed',
-  //     data: {
-  //       transaction
-  //     }
-  //   };
-  // }
+    // public async validateFunding(txRef: string, otp: string, user: any) {
+    //   const { accountId } = user;
+    //   const transaction = await this.connection.getRepository(Transaction).findOne({
+    //     where: {
+    //       reference: txRef,
+    //       account: accountId
+    //     },
+    //     relations: ['account']
+    //   });
 
-  // public static async creditAccount(
-  //   account: Account,
-  //   creditAmount: number,
-  //   transactionDetails: { narration: string, category: TransactionCategory } | undefined = undefined
-  // ) {
-  //   if (transactionDetails) {
-  //     const transaction = new Transaction();
-  //     transaction.amount = creditAmount;
-  //     transaction.type = TransactionType.CREDIT;
-  //     transaction.category = transactionDetails.category;
-  //     transaction.account = account;
-  //     transaction.balance_after = account.balance + creditAmount;
-  //     transaction.balance_before = account.balance;
-  //     transaction.narration = transactionDetails.narration;
-  //     transaction.meta_data = transaction.narration;
+    //   if (!transaction) {
+    //     throw new ServiceError({ status: 404, message: 'Transaction not found ' });
+    //   }
+    //   const result = await paymentService.validateCharge(transaction.ext_reference, otp);
+    //   if (result.status !== 'success') {
+    //     throw new ServiceError({ status: 400, message: 'Could not validate charge' });
+    //   }
 
-  //     await manager.save(Transaction, transaction);
-  //   }
+    //   await this.connection.getRepository(Transaction).update({
+    //     reference: transaction.reference
+    //   }, {
+    //     last_ext_response: result.data.status as string
+    //   });
 
-  //   await manager.update(
-  //     Account,
-  //     { id: account.id },
-  //     {
-  //       balance: account.balance + Number(creditAmount)
-  //     }
-  //   );
-  // }
+    //   await this.connection.transaction(async (manager) => {
+    //     await manager.update(Transaction, {
+    //       reference: transaction.reference
+    //     }, {
+    //       last_ext_response: result.data.status as string
+    //     });
 
-  // public static async debitAccount(
-  //   account: Account,
-  //   debitAmount: number,
-  //   transactionDetails: { narration: string, category: TransactionCategory },
-  //   manager: EntityManager
-  // ) {
-  //   if (account.balance < debitAmount) {
-  //     throw new ServiceError({ message: 'Insufficient balance', status: 400 });
-  //   }
-  //   const transaction = new Transaction();
-  //   transaction.amount = debitAmount;
-  //   transaction.type = TransactionType.DEBIT;
-  //   transaction.category = transactionDetails.category;
-  //   transaction.account = account;
-  //   transaction.balance_after = account.balance - debitAmount;
-  //   transaction.balance_before = account.balance;
-  //   transaction.narration = transactionDetails.narration;
-  //   transaction.meta_data = transaction.narration;
+    //     await AccountService.creditAccount(
+    //       transaction.account,
+    //       transaction.amount,
+    //       manager
+    //     );
+    //   });
 
-  //   await manager.save(Transaction, transaction);
-  //   console.log('transacgion', transaction);
-  //   await manager.update(
-  //     Account,
-  //     { id: account.id },
-  //     {
-  //       balance: account.balance - debitAmount
-  //     }
-  //   );
-  // }
+    //   return {
+    //     message: 'Charge completed',
+    //     data: {
+    //       transaction
+    //     }
+    //   };
+    // }
 
-//   public async Transfer<Type extends {email: string }>(
-//     creditUserEmail: Type,
-//     debitUserEmail: Type,
-//     amount: number,
-//     narration: string
-//   ) {
-//     const accountRepo = this.connection.getRepository(Account);
-//     const userRepo = this.connection.getRepository(User);
+    public async creditAccount(
+        userId: string,
+        creditAmount: number,
+        manager: EntityManager,
+        transactionDetails: { narration: string; category: TransactionCategory }
+    ) {
+        let account = await this.accountRepository.findByUserId(
+            userId,
+            manager,
+            true
+        )
+        if (!account) {
+            throw new NotFoundError('Credit account not found')
+        }
+        const oldBalance = account.balance
 
-//     const creditUser: User | undefined = await userRepo.findOne({
-//       where: {
-//         email: creditUserEmail
-//       }
-//     });
-//     if (!creditUser) {
-//       throw new ServiceError({ message: 'Credit user not found', status: 404 });
-//     }
-//     const creditAccount = await accountRepo.findOne({
-//       where: { user: creditUser.id }
-//     });
+        account = await this.accountRepository.updateBalance(
+            account,
+            creditAmount,
+            'inc',
+            manager
+        )
+        const transactionData = {
+            amount: creditAmount,
+            type: TransactionType.CREDIT,
+            accountId: account.id,
+            meta_data: transactionDetails.narration,
+            balance_after: account.balance,
+            balance_before: oldBalance,
+            ...transactionDetails,
+        }
+        await this.transactionRepository.createAndSave(transactionData, manager)
 
-//     const debitUser: User | undefined = await userRepo.findOne({
-//       where: {
-//         email: debitUserEmail
-//       }
-//     });
-//     if (!debitUser) {
-//       throw new ServiceError({ message: 'Debit user not found', status: 404 });
-//     }
-//     const debitAccount = await accountRepo.findOne({
-//       where: { user: debitUser.id }
-//     });
+        return account
+    }
 
-//     await this.connection.transaction(async (manager) => {
-//       const transactionDetails = {
-//         narration,
-//         category: TransactionCategory.WALLET_TRANSFER,
-//       };
-//       await AccountService.creditAccount(
-// creditAccount as Account,
-// amount,
-// manager,
-// transactionDetails,
-//       );
-//       await AccountService.debitAccount(
-// debitAccount as Account,
-// amount,
-// transactionDetails,
-// manager
-//       );
-//     });
+    public async debitAccount(
+        userId: string,
+        debitAmount: number,
+        manager: EntityManager,
+        transactionDetails: { narration: string; category: TransactionCategory }
+    ) {
+        let account = await this.accountRepository.findByUserId(
+            userId,
+            manager,
+            true
+        )
 
-//     return {
-//       balance: debitAccount!.balance - amount,
-//     };
-//   }
+        if (!account) {
+            throw new NotFoundError('Debit account not found')
+        }
+
+        if (account.balance < debitAmount) {
+            throw new ConflictError('Insufficient balance')
+        }
+
+        const oldBalance = account.balance
+
+        account = await this.accountRepository.updateBalance(
+            account,
+            debitAmount,
+            'dec',
+            manager
+        )
+        const transactionData = {
+            amount: debitAmount,
+            type: TransactionType.DEBIT,
+            accountId: account.id,
+            meta_data: transactionDetails.narration,
+            balance_after: account.balance,
+            balance_before: oldBalance,
+            ...transactionDetails,
+        }
+        await this.transactionRepository.createAndSave(transactionData, manager)
+
+        return account
+    }
+
+    public async transfer(
+        creditUserId: string,
+        debitUserId: string,
+        amount: number,
+        narration: string
+    ) {
+        if (amount < 50) {
+            throw new APIError('Amount can not be less than 50', 400)
+        }
+        if (creditUserId == debitUserId) {
+            throw new APIError(
+                'Debit user and credit user can not be the same',
+                400
+            )
+        }
+        const accountRepository = this.accountRepository as AccountRepository
+
+        const account = await accountRepository.manager.transaction(
+            async (manager) => {
+                const transactionDetails = {
+                    narration: narration ? `INT_TRF_${narration}` : 'INT_TEF',
+                    category: TransactionCategory.WALLET_TRANSFER,
+                }
+                const creditAccount = await this.creditAccount(
+                    creditUserId,
+                    amount,
+                    manager,
+                    transactionDetails
+                )
+                const debitAccount = await this.debitAccount(
+                    debitUserId,
+                    amount,
+                    manager,
+                    transactionDetails
+                )
+                return debitAccount
+            }
+        )
+        return account
+    }
 }

@@ -1,0 +1,360 @@
+{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NTI5MDQyNCwiaWF0IjoxNjUyMDE5MjM2LCJuYmYiOjE2NTIwMTkyMzYsImV4cCI6MTY1MjEwNTYzNn0.Vjwqw3GWGMDVWTR8WcDfsLjxh2IXp8BBoWRVPcaG9UI",
+  "user": {
+    "integrations": [
+      {
+        "business_name": "milz",
+        "business_type": "starter",
+        "short_name": null,
+        "id": 745693,
+        "logged_in_user_role": {
+          "id": 34,
+          "name": "admin",
+          "description": "This role grants users the permissions to manage everything on the dashboard"
+        },
+        "country_code": "NG",
+        "country": 1,
+        "mfa": {
+          "is_required": false,
+          "enforcement_deadline": null
+        }
+      }
+    ],
+    "email": "omilosamuel@gmail.com",
+    "first_name": "Samuel",
+    "last_name": "Omilo",
+    "phone": "8153632823",
+    "area_code": "0",
+    "calling_code": "+234",
+    "registration_complete": true,
+    "last_login": "2022-05-08T13:40:56.000Z",
+    "wt_access": "none",
+    "is_developer": true,
+    "job_title": "",
+    "truecaller_verified": false,
+    "drip_tag": "merchant - nigeria",
+    "mfa_enabled": false,
+    "email_verified": true,
+    "id": 5290424,
+    "invited_by": null,
+    "current_integration": 745693,
+    "passwordLastResetAt": null,
+    "createdAt": "2022-02-24T06:33:01.000Z",
+    "updatedAt": "2022-05-08T13:41:39.000Z",
+    "display_state": "test",
+    "role": {
+      "value": 35175782154239,
+      "name": "admin",
+      "description": "This role grants users the permissions to manage everything on the dashboard",
+      "integration": 0,
+      "service": "dashboard",
+      "id": 34,
+      "organization": 1,
+      "createdAt": "2018-05-10T23:40:26.000Z",
+      "updatedAt": "2018-09-12T17:28:31.000Z",
+      "isDeleted": false,
+      "is_custom": false
+    },
+    "permissions": [
+      "api-key-*",
+      "api-key-view",
+      "user-view",
+      "user-*",
+      "metrics-*",
+      "settings-*",
+      "settings-view",
+      "transaction-view",
+      "transaction-export",
+      "transaction-dispute",
+      "customer-view",
+      "customer-add",
+      "customer-*",
+      "transfer-view",
+      "transfer-*",
+      "transfer-export",
+      "balance-view",
+      "balance-export",
+      "page-view",
+      "page-*",
+      "plan-view",
+      "plan-*",
+      "settlement-view",
+      "settlement-export",
+      "paymentrequest-view",
+      "paymentrequest-*",
+      "subaccount-*",
+      "subaccount-view",
+      "user-add",
+      "customer-insights",
+      "accounts-*",
+      "accounts-view",
+      "charge-*",
+      "request-payout",
+      "product-view",
+      "product-*",
+      "pos-terminal-*",
+      "applepay-*",
+      "refund-pwt",
+      "corporate-cards-*",
+      "corporate-cards-view"
+    ],
+    "password_expiry": "2023-02-19T06:33:01.000Z",
+    "dashboard_preferences": {
+      "pagination": {
+        "use_cursor": true
+      },
+      "timezone": "UTC"
+    },
+    "show_mfa_feature": true
+  },
+  "selected_integration": {
+    "users": [],
+    "keys": [],
+    "terminals": [],
+    "starterintegration": [],
+    "integrationlocale": [
+      {
+        "id": 710994,
+        "integration": 745693,
+        "locale": 26,
+        "locale_overrides": null,
+        "createdAt": "2022-02-24T06:33:01.000Z",
+        "updatedAt": "2022-02-24T06:33:01.000Z"
+      }
+    ],
+    "business_name": "milz",
+    "description": null,
+    "rc_number": null,
+    "phone": "8153632823",
+    "email": "omilosamuel@gmail.com",
+    "address": null,
+    "product_name": null,
+    "registration_document_number": null,
+    "registration_document_type": null,
+    "primary_contact_name": null,
+    "primary_contact_email": null,
+    "primary_contact_phone": null,
+    "support_email": null,
+    "chargeback_email": null,
+    "logo_path": "https://public-files-paystack-prod.s3.eu-west-1.amazonaws.com/integration-logos/paystack.jpg",
+    "integration_agreement_path": null,
+    "settlement_bank": null,
+    "account_number": null,
+    "registration_document_path": null,
+    "risk_level": "high",
+    "isw_category": 3,
+    "mcc_category": null,
+    "flat_rate": 100,
+    "charge_percentage": 1.5,
+    "international_flat_rate": 100,
+    "international_charge_percentage": 3.9,
+    "flat_threshhold": 2500,
+    "transfer_charge": 5000,
+    "settlement_schedule": "T1",
+    "test_redirect_url": null,
+    "test_webhook_endpoint": "https://f4e0-102-89-44-200.ngrok.io/paystack-webhook",
+    "live_redirect_url": null,
+    "live_webhook_endpoint": null,
+    "test_integration_url": null,
+    "test_integration_instruction": null,
+    "email_notification": "instant",
+    "pwc_id": 102501,
+    "is_live": false,
+    "go_live_requested": false,
+    "go_live_requested_at": null,
+    "live_keys_requested": false,
+    "live_keys_requested_at": null,
+    "reviewed_at": null,
+    "setup_complete": false,
+    "receipts": true,
+    "display_state": "test",
+    "active": true,
+    "short_name": null,
+    "international_toggle_disabled": true,
+    "allow_international_cards": false,
+    "active_channels": [
+      "card",
+      "bank",
+      "qr",
+      "ussd",
+      "bank_transfer"
+    ],
+    "allowed_currencies": [
+      "NGN"
+    ],
+    "allow_whitelist": false,
+    "charge_from_dashboard": false,
+    "can_transfer": true,
+    "transfer_using_otp": true,
+    "payouts_on_hold": false,
+    "go_live_date": null,
+    "payments_session_timeout": 0,
+    "metadata": null,
+    "transfer_notification": "instant",
+    "business_category": null,
+    "business_size": null,
+    "business_type": "starter",
+    "website_url": null,
+    "social_urls": null,
+    "is_under_investigation": false,
+    "is_disabled": false,
+    "disable_reason": null,
+    "disable_at": null,
+    "identity_evidence_path": null,
+    "director_identity_evidence_path": null,
+    "bvn": null,
+    "bvn_date_of_birth": null,
+    "go_live_status": "none",
+    "registration_packet_path": null,
+    "is_deleted": false,
+    "default_currency": "NGN",
+    "transfer_notification_to_recipient": "instant",
+    "send_transfer_email_otp": true,
+    "fast_checkout_enabled": false,
+    "id": 745693,
+    "primary_user": 5290424,
+    "organization": 1,
+    "createdAt": "2022-02-24T06:33:01.000Z",
+    "updatedAt": "2022-05-08T13:43:14.000Z",
+    "transfer_fees": [
+      {
+        "fee": 5000,
+        "thresholds": [
+          {
+            "max": 499999,
+            "fee": 1000
+          },
+          {
+            "max": 4999999,
+            "fee": 2500
+          }
+        ],
+        "currency": "NGN"
+      },
+      {
+        "fee": 1000,
+        "currency": "GHS"
+      }
+    ],
+    "consent_received": true,
+    "consent_data": {
+      "given_by": "omilosamuel@gmail.com",
+      "given_at": "2022-02-24T06:33:01.000Z"
+    },
+    "attributes": {
+      "id": 645653,
+      "integration": 745693,
+      "country": {
+        "id": 1,
+        "active_for_dashboard_onboarding": true,
+        "name": "Nigeria",
+        "iso_code": "NG",
+        "default_currency_code": "NGN",
+        "integration_defaults": {},
+        "calling_code": "+234",
+        "pilot_mode": false,
+        "relationships": {
+          "currency": {
+            "type": "currency",
+            "data": [
+              "NGN"
+            ]
+          },
+          "integration_feature": {
+            "type": "integration_feature",
+            "data": []
+          },
+          "integration_type": {
+            "type": "integration_type",
+            "data": [
+              "ITYPE_001",
+              "ITYPE_002",
+              "ITYPE_003"
+            ]
+          },
+          "payment_method": {
+            "type": "payment_method",
+            "data": [
+              "PAYM_001",
+              "PAYM_002",
+              "PAYM_003",
+              "PAYM_004"
+            ]
+          }
+        }
+      },
+      "industry": null,
+      "integration_type": {
+        "id": 1,
+        "code": "ITYPE_001",
+        "label": "starter",
+        "display_name": "Starter Business",
+        "description": "Choose this if your business is not registered yet",
+        "is_active": true,
+        "relationships": {
+          "kyc_requirement": {
+            "type": "kyc_requirement",
+            "data": [
+              "KYCREQ_001",
+              "KYCREQ_015"
+            ]
+          }
+        },
+        "upgradable_to": [
+          "ITYPE_002"
+        ]
+      },
+      "legal_business_name": null,
+      "duplicated_from_integration": null,
+      "compliance_status": "NEW",
+      "compliance_due_date": "2022-03-26T00:00:00.000Z",
+      "incorporation_date": null,
+      "country_code": "NG",
+      "industry_code": null,
+      "registration_number": null,
+      "registration_type": null,
+      "ownership_type": null,
+      "industry_categories": null,
+      "area_code": "0",
+      "calling_code": "+234",
+      "form_three_evidence_path": null,
+      "settlement_account_type": "bank_account",
+      "international_requested": false,
+      "compliance_documents_submitted": false,
+      "incorporated_before_2017": 0,
+      "has_refreshed_incorporation_documents": false,
+      "process_amex_cards": false,
+      "is_terminal_integration": false,
+      "mfa_is_required": false,
+      "mfa_enforcement_deadline": null,
+      "createdAt": "2022-02-24T06:33:01.000Z",
+      "updatedAt": "2022-05-04T11:35:27.000Z"
+    },
+    "terminal_integration_attribute": null,
+    "is_terminal_active": false,
+    "is_registration_type_supported_for_terminal": false,
+    "office_address": {},
+    "registered_address": {},
+    "available_channels": [
+      "bank",
+      "card",
+      "qr",
+      "ussd",
+      "bank_transfer",
+      "payattitude"
+    ],
+    "agreements": {
+      "settlement_managed_account": {
+        "agreements": [],
+        "visible": false
+      }
+    },
+    "payouts_on_hold_reason": null,
+    "logged_in_user_role": {
+      "id": 34,
+      "name": "admin",
+      "description": "This role grants users the permissions to manage everything on the dashboard"
+    }
+  },
+  "token_expiry": 1652105636
+}

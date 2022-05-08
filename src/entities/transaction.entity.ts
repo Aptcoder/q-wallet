@@ -60,6 +60,9 @@ export default class Transaction extends BaseEntity {
   })
     account!: Account;
 
+  @Column({ nullable: false })
+  accountId!: number
+
   @Column({
     type: 'numeric',
     precision: 20,

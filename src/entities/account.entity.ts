@@ -1,5 +1,5 @@
 import {
-  Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn, BaseEntity
+  Column, Entity, OneToOne, PrimaryGeneratedColumn, JoinColumn, BaseEntity, Index
 } from 'typeorm';
 import User from './user.entity';
 
@@ -20,6 +20,10 @@ export default class Account extends BaseEntity {
     }
   })
     balance!: number;
+
+  @Index()
+  @Column({ nullable: false })
+  userId!: number;
 
   @JoinColumn()
   @OneToOne(() => User, (user) => user.account, {
