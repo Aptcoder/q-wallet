@@ -11,7 +11,7 @@ export default {
     dbPassword: 'wonderful.',
     dbUsername: 'postgres',
     dbSync: true,
-    jwtSecret: 'eyvryreyiveyvewiwyeyvwwyve',
+    jwtSecret: process.env.JWT_SECRET,
     flw_secret: process.env.FLW_SECRET,
     flw_encryption_key: process.env.FLW_ENCRYPTION_KEY,
 }

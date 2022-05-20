@@ -10,7 +10,7 @@ export default {
     dbPort: 5342,
     dbPassword: 'wonderful.',
     dbUsername: 'postgres',
-    jwtSecret: 'eyvryreyiveyvewiwyeyvwwyve',
+    jwtSecret: process.env.JWT_SECRET,
     flw_secret: process.env.FLW_SECRET,
     flw_encryption_key: process.env.FLW_ENCRYPTION_KEY,
     dbSync: false,
