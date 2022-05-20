@@ -8,10 +8,6 @@ import {
     createUserBodySchema,
     authUserBodySchema,
 } from '../../schemas/user.schemas'
-import AccountService from '../../services/account.services'
-import AccountRepository from '../../repositories/account.repository'
-import TransactionRepository from '../../repositories/transaction.repository'
-
 const userRepository =
     getConnection('q-wallet').getCustomRepository(UserRepository)
 

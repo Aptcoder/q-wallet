@@ -57,7 +57,7 @@ export default class UserService implements IUserService {
             throw new NotFoundError('User not found')
         }
 
-        const comparePasswordResult = this._comparePassword(
+        const comparePasswordResult = await this._comparePassword(
             userPassword,
             user.password
         )
@@ -84,7 +84,6 @@ export default class UserService implements IUserService {
     }
 
     public async _generateToken(user: User): Promise<{ accessToken: string }> {
-        console.log('user', user)
         const payload = {
             email: user.email,
             id: user.id,

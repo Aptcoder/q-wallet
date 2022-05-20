@@ -1,28 +1,25 @@
-import { createConnection, Connection } from 'typeorm';
-import config from 'config';
-import path from 'path';
+import { createConnection, Connection } from 'typeorm'
+import config from 'config'
+import path from 'path'
 
-const entityPath = path.resolve(__dirname, '..', 'entities');
+const entityPath = path.resolve(__dirname, '..', 'entities')
 
-export default (): Promise<void | Connection> => createConnection({
-  name: 'q-wallet',
-  type: 'postgres',
-  host: config.get<string>('dbHost'),
-  port: 5432,
-  username: config.get<string>('dbUsername'),
-  password: config.get<string>('dbPassword'),
-  database: config.get<string>('dbName'),
-  entities: [
-    `${entityPath}/*.{js,ts}`,
-  ],
-  synchronize: false,
-  logging: true,
-})
-  .then((connection) => {
-    console.log('Sucessfully connected to db');
-  })
-  .catch((err) => {
-    console.log('Could not connect to db', err);
-    process.exit();
-  });
-
+export default (): Promise<void | Connection> =>
+    createConnection({
+        name: 'q-wallet',
+        type: 'postgres',
+        host: config.get<string>('dbHost'),
+        port: 5432,
+        username: config.get<string>('dbUsername'),
+        password: config.get<string>('dbPassword'),
+        database: config.get<string>('dbName'),
+        entities: [`${entityPath}/*.{js,ts}`],
+        synchronize: config.get<boolean>('dbSync'),
+    })
+        .then((connection) => {
+            console.log('Sucessfully connected to db')
+        })
+        .catch((err) => {
+            console.log('Could not connect to db', err)
+            process.exit(1)
+        })

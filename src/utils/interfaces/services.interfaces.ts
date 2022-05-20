@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+import { TransactionCategory } from '../../entities/transaction.entity'
+import { EntityManager } from 'typeorm'
 import Account from '../../entities/account.entity'
 import { AuthUserDto, CreateUserDto } from '../dtos/users.dto'
 
@@ -17,5 +19,23 @@ export interface IAccountService {
         debitUserId: string,
         amount: number,
         narration?: string
+    ): Promise<Account>
+    creditAccount(
+        userId: string,
+        creditAccount: number,
+        manager?: EntityManager,
+        transactionDetails?: {
+            narration: string
+            category: TransactionCategory
+        }
+    ): Promise<Account>
+    debitAccount(
+        userId: string,
+        creditAccount: number,
+        manager?: EntityManager,
+        transactionDetails?: {
+            narration: string
+            category: TransactionCategory
+        }
     ): Promise<Account>
 }

@@ -1,13 +1,37 @@
-import { reqWithUser } from 'src/utils/types'
+import { reqWithUser } from '../../utils/types'
 import { IAccountService } from '../../utils/interfaces/services.interfaces'
 import AccountController from '../account.controller'
 import { Response } from 'express'
 import Account from '../../entities/account.entity'
+import { TransactionCategory } from '../../entities/transaction.entity'
+import { EntityManager } from 'typeorm'
 
 describe('Account controller', () => {
     const mockAccountService: IAccountService = {
         getBalance(email: string) {
             return Promise.resolve(2)
+        },
+        creditAccount(
+            userId: string,
+            creditAccount: number,
+            manager: EntityManager,
+            transactionDetails?: {
+                narration: string
+                category: TransactionCategory
+            }
+        ) {
+            return Promise.resolve(new Account())
+        },
+        debitAccount(
+            userId: string,
+            creditAccount: number,
+            manager: EntityManager,
+            transactionDetails?: {
+                narration: string
+                category: TransactionCategory
+            }
+        ) {
+            return Promise.resolve(new Account())
         },
         transfer(
             creditUserId: string,
