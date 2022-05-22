@@ -1,4 +1,5 @@
 import exp from 'constants'
+import { BankTransferDto } from '../../utils/dtos/account.dto'
 import { EntityManager } from 'typeorm'
 import Account from '../../entities/account.entity'
 import Transaction, {
@@ -9,7 +10,10 @@ import {
     IAccountRepository,
     ITransactionRepository,
 } from '../../utils/interfaces/repos.interfaces'
-import { IAccountService } from '../../utils/interfaces/services.interfaces'
+import {
+    IAccountService,
+    IPaymentService,
+} from '../../utils/interfaces/services.interfaces'
 import AccountService from '../account.services'
 
 describe('Account service', () => {
@@ -21,6 +25,14 @@ describe('Account service', () => {
 
     const account = new Account()
 
+    const paymentServiceMock: IPaymentService = {
+        chargeWithTransfer(bankTransferDto: BankTransferDto) {
+            return Promise.resolve({
+                success: true,
+                data: {},
+            })
+        },
+    }
     const mockAccountRepository: IAccountRepository = {
         findOne({}) {
             return Promise.resolve(account)
@@ -44,7 +56,8 @@ describe('Account service', () => {
     afterEach(() => {
         accountService = new AccountService(
             mockAccountRepository,
-            mockTransactionRepository
+            mockTransactionRepository,
+            paymentServiceMock
         )
 
         jest.clearAllMocks()
@@ -185,5 +198,23 @@ describe('Account service', () => {
         expect(findUserByIdSpy).toHaveBeenCalled()
         expect(updateBalanceSpy).toHaveBeenCalled()
         expect(createAndSaveSpy).toHaveBeenCalled()
+    })
+
+    it('Should call charge with transfer on payment service', async () => {
+        const paymentServiceChargeWithCardSpy = jest.spyOn(
+            paymentServiceMock,
+            'chargeWithTransfer'
+        )
+        const result = await accountService.fundWithTransfer({
+            email: 'sample@user.com',
+            amount: '5000',
+        })
+
+        expect(paymentServiceChargeWithCardSpy).toHaveBeenCalled()
+        expect(paymentServiceChargeWithCardSpy).toHaveBeenCalledWith({
+            email: 'sample@user.com',
+            amount: '5000',
+            reference: expect.any(String),
+        })
     })
 })

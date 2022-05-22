@@ -3,6 +3,7 @@ import { TransactionCategory } from '../../entities/transaction.entity'
 import { EntityManager } from 'typeorm'
 import Account from '../../entities/account.entity'
 import { AuthUserDto, CreateUserDto } from '../dtos/users.dto'
+import { BankTransferDto } from '../dtos/account.dto'
 
 export interface IUserService {
     create(createUserDto: CreateUserDto): any
@@ -14,6 +15,7 @@ export interface IUserService {
 
 export interface IAccountService {
     getBalance(userId: string): Promise<number>
+    fundWithTransfer(bankTransferDto: BankTransferDto): Promise<{}>
     transfer(
         creditUserId: string,
         debitUserId: string,
@@ -38,4 +40,11 @@ export interface IAccountService {
             category: TransactionCategory
         }
     ): Promise<Account>
+}
+
+export interface IPaymentService {
+    chargeWithTransfer(bankTransferDto: BankTransferDto): Promise<{
+        success: boolean
+        data: {}
+    }>
 }

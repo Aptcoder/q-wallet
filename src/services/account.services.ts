@@ -4,25 +4,29 @@ import {
     IAccountRepository,
     ITransactionRepository,
 } from 'src/utils/interfaces/repos.interfaces'
-import paymentService from '../utils/payment.service'
 import Account from '../entities/account.entity'
 import User from '../entities/user.entity'
 import Transaction, {
     TransactionType,
     TransactionCategory,
 } from '../entities/transaction.entity'
-import ServiceError from '../utils/service.error'
-import { IAccountService } from '../utils/interfaces/services.interfaces'
+import {
+    IAccountService,
+    IPaymentService,
+} from '../utils/interfaces/services.interfaces'
 import { APIError, ConflictError, NotFoundError } from '../utils/errors'
 import AccountRepository from '../repositories/account.repository'
+import { BankTransferDto } from '../utils/dtos/account.dto'
 
 export default class AccountService implements IAccountService {
     constructor(
         private accountRepository: IAccountRepository,
-        private transactionRepository: ITransactionRepository
+        private transactionRepository: ITransactionRepository,
+        private paymentService: IPaymentService
     ) {
         this.accountRepository = accountRepository
         this.transactionRepository = transactionRepository
+        this.paymentService = paymentService
     }
 
     // private static processCardPaymentResult(result: any) {
@@ -89,6 +93,22 @@ export default class AccountService implements IAccountService {
             throw new NotFoundError('Account not found')
         }
         return account.balance
+    }
+
+    public async fundWithTransfer(
+        bankTransferDto: BankTransferDto
+    ): Promise<{}> {
+        const tx_ref = randomUUID()
+        const result = await this.paymentService.chargeWithTransfer({
+            reference: tx_ref,
+            email: bankTransferDto.email,
+            amount: bankTransferDto.amount,
+        })
+
+        if (!result.success) {
+            throw new APIError('Could not intiate transfer', 500)
+        }
+        return result.data
     }
 
     // public async initiateCardFunding(
@@ -218,7 +238,11 @@ export default class AccountService implements IAccountService {
         userId: string,
         creditAmount: number,
         manager: EntityManager,
-        transactionDetails: { narration: string; category: TransactionCategory }
+        transactionDetails: {
+            narration: string
+            category: TransactionCategory
+            ext_reference?: string
+        }
     ) {
         let account = await this.accountRepository.findByUserId(
             userId,

@@ -4,5 +4,7 @@ const makeTransferBodySchema = Joi.object().keys({
     amount: Joi.number().min(50).required(),
     narration: Joi.string(),
 })
-
-export { makeTransferBodySchema }
+const fundAccountBody = Joi.object().keys({
+    amount: Joi.number().min(50).required(),
+})
+export { makeTransferBodySchema, fundAccountBody }

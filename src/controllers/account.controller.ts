@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { Response } from 'express'
-import { IAccountService } from 'src/utils/interfaces/services.interfaces'
+import { APIError } from '../utils/errors'
+import { IAccountService } from '../utils/interfaces/services.interfaces'
 import { processError } from '../utils/helpers'
 import { reqWithUser } from '../utils/types'
 
@@ -20,6 +21,31 @@ export default (accountService: IAccountService) => ({
                 },
             })
         } catch (err: any) {
+            return processError(res, err)
+        }
+    },
+
+    async fundAccount(req: reqWithUser, res: Response) {
+        try {
+            const { id: userId, email } = req.user
+            const method = req.query.method
+            if (method == 'transfer') {
+                const { amount } = req.body
+                const result = await accountService.fundWithTransfer({
+                    amount,
+                    email,
+                })
+                return res.send({
+                    message: 'Transfer initiated. Make transfer to details',
+                    status: 'success',
+                    data: {
+                        ...result,
+                    },
+                })
+            }
+
+            throw new APIError('Invalid fund method', 400)
+        } catch (err) {
             return processError(res, err)
         }
     },
