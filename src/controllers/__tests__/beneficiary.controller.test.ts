@@ -1,12 +1,12 @@
-import { CreateBeneficiaryDto } from '../../utils/dtos/beneficiary.dto'
 import { IBeneficiaryService } from '../../utils/interfaces/services.interfaces'
 import { reqWithUser } from '../../utils/types'
 import BeneficiaryController from '../beneficiary.controller'
 import { Response } from 'express'
+import { VerifyAccountDto } from 'src/utils/dtos/beneficiary.dto'
 
 describe('Beneficiary controller', () => {
     const mockBeneficiaryService: IBeneficiaryService = {
-        createBeneficiary(userId: string) {
+        createBeneficiary(userId: string, verifyAccountDto: VerifyAccountDto) {
             return Promise.resolve({})
         },
     }

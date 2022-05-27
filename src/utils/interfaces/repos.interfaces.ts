@@ -4,6 +4,7 @@ import Account from '../../entities/account.entity'
 import User from '../../entities/user.entity'
 import { CreateTransactionDto } from '../dtos/transaction.dto'
 import { CreateUserDto } from '../dtos/users.dto'
+import { CreateBeneficiaryDto } from '../dtos/beneficiary.dto'
 
 /* eslint-disable no-unused-vars */
 export interface IAccountRepository {
@@ -36,4 +37,9 @@ export interface ITransactionRepository {
     ): Promise<Transaction>
 }
 
-export interface IBeneficiaryRepository {}
+export interface IBeneficiaryRepository {
+    createAndSave(
+        createBeneficiaryDto: CreateBeneficiaryDto,
+        manager?: EntityManager
+    ): Promise<{}>
+}

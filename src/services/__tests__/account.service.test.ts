@@ -32,6 +32,9 @@ describe('Account service', () => {
                 data: {},
             })
         },
+        verifyAccount() {
+            return Promise.resolve({ success: true, data: {} })
+        },
     }
     const mockAccountRepository: IAccountRepository = {
         findOne({}) {

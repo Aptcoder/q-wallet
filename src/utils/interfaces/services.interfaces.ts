@@ -4,7 +4,7 @@ import { EntityManager } from 'typeorm'
 import Account from '../../entities/account.entity'
 import { AuthUserDto, CreateUserDto } from '../dtos/users.dto'
 import { BankTransferDto } from '../dtos/account.dto'
-import { CreateBeneficiaryDto } from '../dtos/beneficiary.dto'
+import { VerifyAccountDto } from '../dtos/beneficiary.dto'
 
 export interface IUserService {
     create(createUserDto: CreateUserDto): any
@@ -48,8 +48,18 @@ export interface IPaymentService {
         success: boolean
         data: {}
     }>
+    verifyAccount(verifyAccount: VerifyAccountDto): Promise<{
+        success: boolean
+        data: {
+            account_name?: string
+            bank_name?: string
+        }
+    }>
 }
 
 export interface IBeneficiaryService {
-    createBeneficiary(userId: string): Promise<{}>
+    createBeneficiary(
+        userId: string,
+        verifyAccountDto: VerifyAccountDto
+    ): Promise<{}>
 }

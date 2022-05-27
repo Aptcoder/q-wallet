@@ -1,6 +1,7 @@
 import {
     BaseEntity,
     Column,
+    Entity,
     Index,
     JoinColumn,
     ManyToOne,
@@ -9,6 +10,7 @@ import {
 } from 'typeorm'
 import User from './user.entity'
 
+@Entity()
 export default class Beneficiary extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id!: string
@@ -24,6 +26,7 @@ export default class Beneficiary extends BaseEntity {
 
     @Column({
         nullable: false,
+        unique: true,
     })
     bank_account!: string
 
@@ -35,5 +38,5 @@ export default class Beneficiary extends BaseEntity {
     @Column({
         nullable: false,
     })
-    bank_name!: string
+    bank_code!: string
 }

@@ -8,7 +8,10 @@ export default (beneficiaryService: IBeneficiaryService) => ({
         try {
             const { id: userId } = req.user
             const beneficiary = await beneficiaryService.createBeneficiary(
-                userId
+                userId,
+                {
+                    ...req.body,
+                }
             )
             return res.status(201).send({
                 message: 'Beneficiary created',
