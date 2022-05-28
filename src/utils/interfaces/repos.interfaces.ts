@@ -5,6 +5,8 @@ import User from '../../entities/user.entity'
 import { CreateTransactionDto } from '../dtos/transaction.dto'
 import { CreateUserDto } from '../dtos/users.dto'
 import { CreateBeneficiaryDto } from '../dtos/beneficiary.dto'
+import Beneficiary from 'src/entities/beneficiary.entity'
+import { IBeneficiary } from './entities.interfaces'
 
 /* eslint-disable no-unused-vars */
 export interface IAccountRepository {
@@ -43,4 +45,8 @@ export interface IBeneficiaryRepository {
         manager?: EntityManager
     ): Promise<{}>
     findByUserId(userId: string): Promise<any[]>
+    findOneWithUserId(
+        userId: string,
+        beneficiaryId: string
+    ): Promise<IBeneficiary | undefined>
 }

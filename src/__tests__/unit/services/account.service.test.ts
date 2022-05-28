@@ -1,20 +1,15 @@
-import exp from 'constants'
-import { BankTransferDto } from '../../utils/dtos/account.dto'
 import { EntityManager } from 'typeorm'
-import Account from '../../entities/account.entity'
-import Transaction, {
-    TransactionCategory,
-} from '../../entities/transaction.entity'
-import { ConflictError, NotFoundError } from '../../utils/errors'
+import Account from '../../../entities/account.entity'
+import { ConflictError, NotFoundError } from '../../../utils/errors'
+import { IAccountService } from '../../../utils/interfaces/services.interfaces'
+import AccountService from '../../../services/account.services'
 import {
-    IAccountRepository,
-    ITransactionRepository,
-} from '../../utils/interfaces/repos.interfaces'
-import {
-    IAccountService,
-    IPaymentService,
-} from '../../utils/interfaces/services.interfaces'
-import AccountService from '../account.services'
+    mockAccountRepository,
+    mockBeneficiaryRepository,
+    mockTransactionRepository,
+} from '../../mocks/repo.mocks'
+import { paymentServiceMock } from '../../mocks/service.mocks'
+import { TransactionCategory } from 'src/entities/transaction.entity'
 
 describe('Account service', () => {
     it('A + B', () => {
@@ -22,45 +17,14 @@ describe('Account service', () => {
     })
 
     let accountService: IAccountService
-
     const account = new Account()
-
-    const paymentServiceMock: IPaymentService = {
-        chargeWithTransfer(bankTransferDto: BankTransferDto) {
-            return Promise.resolve({
-                success: true,
-                data: {},
-            })
-        },
-        verifyAccount() {
-            return Promise.resolve({ success: true, data: {} })
-        },
-    }
-    const mockAccountRepository: IAccountRepository = {
-        findOne({}) {
-            return Promise.resolve(account)
-        },
-        update({}) {},
-        findByUserId(userId: string) {
-            return Promise.resolve(account)
-        },
-        updateBalance(account, amount, inc): Promise<Account> {
-            return Promise.resolve(account)
-        },
-    }
-
-    const transaction = new Transaction()
-    const mockTransactionRepository: ITransactionRepository = {
-        createAndSave({}) {
-            return Promise.resolve(transaction)
-        },
-    }
 
     afterEach(() => {
         accountService = new AccountService(
             mockAccountRepository,
             mockTransactionRepository,
-            paymentServiceMock
+            paymentServiceMock,
+            mockBeneficiaryRepository
         )
 
         jest.clearAllMocks()
@@ -204,7 +168,7 @@ describe('Account service', () => {
     })
 
     it('Should call charge with transfer on payment service', async () => {
-        const paymentServiceChargeWithCardSpy = jest.spyOn(
+        const paymentServiceChargeWithTransferSpy = jest.spyOn(
             paymentServiceMock,
             'chargeWithTransfer'
         )
@@ -213,11 +177,71 @@ describe('Account service', () => {
             amount: '5000',
         })
 
-        expect(paymentServiceChargeWithCardSpy).toHaveBeenCalled()
-        expect(paymentServiceChargeWithCardSpy).toHaveBeenCalledWith({
+        expect(paymentServiceChargeWithTransferSpy).toHaveBeenCalled()
+        expect(paymentServiceChargeWithTransferSpy).toHaveBeenCalledWith({
             email: 'sample@user.com',
             amount: '5000',
             reference: expect.any(String),
         })
+    })
+
+    it('Should check for bene when withdraw', async () => {
+        const findOneWithUserId = jest.spyOn(
+            mockBeneficiaryRepository,
+            'findOneWithUserId'
+        )
+
+        await accountService.withdraw('2', 'beneficiaryId')
+        expect(findOneWithUserId).toHaveBeenCalled()
+        expect(findOneWithUserId).toHaveBeenCalledWith('2', 'beneficiaryId')
+    })
+
+    it('Should check for bene when withdraw', async () => {
+        const findOneWithUserId = jest.spyOn(
+            mockBeneficiaryRepository,
+            'findOneWithUserId'
+        )
+
+        await accountService.withdraw('2', 'beneficiaryId')
+        expect(findOneWithUserId).toHaveBeenCalled()
+        expect(findOneWithUserId).toHaveBeenCalledWith('2', 'beneficiaryId')
+    })
+
+    it('Should throw error if beneficiary not found when withdraw', async () => {
+        const findOneWithUserId = jest
+            .spyOn(mockBeneficiaryRepository, 'findOneWithUserId')
+            .mockImplementation(() => Promise.resolve(undefined))
+
+        try {
+            await accountService.withdraw('2', 'beneficiaryId')
+        } catch (err) {
+            expect(err).toBeInstanceOf(NotFoundError)
+        }
+
+        expect(findOneWithUserId).toHaveBeenCalled()
+        expect(findOneWithUserId).toHaveBeenCalledWith('2', 'beneficiaryId')
+    })
+
+    it('Should call payment service transfer on withdraw', async () => {
+        const findOneWithUserId = jest
+            .spyOn(mockBeneficiaryRepository, 'findOneWithUserId')
+            .mockImplementation(() =>
+                Promise.resolve({
+                    bank_account: '083267322',
+                    bank_code: '044',
+                })
+            )
+
+        const payoutSpy = jest.spyOn(paymentServiceMock, 'payout')
+
+        await accountService.withdraw('2', 'beneficiaryId')
+
+        expect(payoutSpy).toBeCalled()
+        expect(payoutSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                bank_account: '083267322',
+                bank_code: '044',
+            })
+        )
     })
 })

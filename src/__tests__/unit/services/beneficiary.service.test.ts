@@ -1,40 +1,11 @@
-import { APIError, ConflictError, NotFoundError } from '../../utils/errors'
-import { IBeneficiaryRepository } from '../../utils/interfaces/repos.interfaces'
-import {
-    IBeneficiaryService,
-    IPaymentService,
-} from '../../utils/interfaces/services.interfaces'
-import UserService from '../user.service'
-import BeneficiaryService from '../beneficiary.service'
-import { BankTransferDto } from '../../utils/dtos/account.dto'
-import {
-    CreateBeneficiaryDto,
-    VerifyAccountDto,
-} from 'src/utils/dtos/beneficiary.dto'
+import { APIError } from '../../../utils/errors'
+import { IBeneficiaryService } from '../../../utils/interfaces/services.interfaces'
+import BeneficiaryService from '../../../services/beneficiary.service'
+import { mockBeneficiaryRepository } from '../../mocks/repo.mocks'
+import { paymentServiceMock } from '../../mocks/service.mocks'
 
 describe('Beneficiary service', () => {
     let beneficiaryService: IBeneficiaryService
-    const mockBeneficiaryRepository: IBeneficiaryRepository = {
-        createAndSave(createBeneficiaryDto: CreateBeneficiaryDto) {
-            return Promise.resolve({})
-        },
-
-        findByUserId(userId: string) {
-            return Promise.resolve([])
-        },
-    }
-
-    const paymentServiceMock: IPaymentService = {
-        chargeWithTransfer(bankTransferDto: BankTransferDto) {
-            return Promise.resolve({
-                success: true,
-                data: {},
-            })
-        },
-        verifyAccount(verifyAccountDto: VerifyAccountDto) {
-            return Promise.resolve({ success: true, data: {} })
-        },
-    }
 
     beforeEach(() => {
         beneficiaryService = new BeneficiaryService(

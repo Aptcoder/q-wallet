@@ -6,6 +6,7 @@
     "scripts": {
         "test": "cross-env NODE_ENV=test && jest",
         "test:watch": "cross-env NODE_ENV=test && jest --watch",
+        "test:watch:unit": "cross-env NODE_ENV=test && jest --watch ./src",
         "build:ts": "tsc --w",
         "typeorm": "ts-node ./node_modules/typeorm/cli.js",
         "start": "ts-node ./src/server.ts",

@@ -2,6 +2,7 @@ import { getConnection, EntityManager } from 'typeorm'
 import { randomUUID } from 'crypto'
 import {
     IAccountRepository,
+    IBeneficiaryRepository,
     ITransactionRepository,
 } from 'src/utils/interfaces/repos.interfaces'
 import Account from '../entities/account.entity'
@@ -22,11 +23,13 @@ export default class AccountService implements IAccountService {
     constructor(
         private accountRepository: IAccountRepository,
         private transactionRepository: ITransactionRepository,
-        private paymentService: IPaymentService
+        private paymentService: IPaymentService,
+        private beneficiaryRepository: IBeneficiaryRepository
     ) {
         this.accountRepository = accountRepository
         this.transactionRepository = transactionRepository
         this.paymentService = paymentService
+        this.beneficiaryRepository = beneficiaryRepository
     }
 
     // private static processCardPaymentResult(result: any) {
@@ -355,5 +358,21 @@ export default class AccountService implements IAccountService {
             }
         )
         return account
+    }
+
+    async withdraw(userId: string, beneficiaryId: string): Promise<{}> {
+        const beneficiary = await this.beneficiaryRepository.findOneWithUserId(
+            userId,
+            beneficiaryId
+        )
+        if (!beneficiary) {
+            throw new NotFoundError('Beneficiary not found')
+        }
+
+        const result = this.paymentService.payout({
+            bank_code: beneficiary.bank_code,
+            bank_account: beneficiary.bank_account,
+        })
+        return {}
     }
 }

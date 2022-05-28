@@ -16,6 +16,7 @@ export interface IUserService {
 
 export interface IAccountService {
     getBalance(userId: string): Promise<number>
+    withdraw(userId: string, beneficiaryId: string): Promise<{}>
     fundWithTransfer(bankTransferDto: BankTransferDto): Promise<{}>
     transfer(
         creditUserId: string,
@@ -54,6 +55,9 @@ export interface IPaymentService {
             account_name?: string
             bank_name?: string
         }
+    }>
+    payout(payoutDto: VerifyAccountDto): Promise<{
+        success: boolean
     }>
 }
 

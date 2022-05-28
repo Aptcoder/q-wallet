@@ -1,33 +1,10 @@
-import { IBeneficiaryService } from '../../utils/interfaces/services.interfaces'
-import { reqWithUser } from '../../utils/types'
-import BeneficiaryController from '../beneficiary.controller'
-import { Response } from 'express'
-import { VerifyAccountDto } from 'src/utils/dtos/beneficiary.dto'
+import { reqWithUser } from '../../../utils/types'
+import BeneficiaryController from '../../../controllers/beneficiary.controller'
+import { mockBeneficiaryService } from '../../mocks/service.mocks'
+import { mockReq, mockRes } from '../../mocks/util.mocks'
 
 describe('Beneficiary controller', () => {
-    const mockBeneficiaryService: IBeneficiaryService = {
-        createBeneficiary(userId: string, verifyAccountDto: VerifyAccountDto) {
-            return Promise.resolve({})
-        },
-
-        getBeneficiaries(userId: string) {
-            return Promise.resolve([])
-        },
-    }
-
     const beneficiaryController = BeneficiaryController(mockBeneficiaryService)
-    const mockReq = {
-        user: {
-            email: 'sample@gmail.com',
-        },
-    } as unknown
-
-    const mockRes = {
-        status: jest.fn(() => {
-            return mockRes
-        }),
-        send: jest.fn(),
-    } as unknown as Response
 
     afterEach(() => {
         jest.clearAllMocks()

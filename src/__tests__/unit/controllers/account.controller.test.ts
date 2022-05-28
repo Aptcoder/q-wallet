@@ -13,6 +13,10 @@ describe('Account controller', () => {
             return Promise.resolve(2)
         },
 
+        withdraw() {
+            return Promise.resolve({})
+        },
+
         fundWithTransfer(bankTransferDto: BankTransferDto) {
             return Promise.resolve({
                 bank_account: '0816352728',

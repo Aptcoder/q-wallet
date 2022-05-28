@@ -2,6 +2,7 @@ import Beneficiary from '../entities/beneficiary.entity'
 import { CreateBeneficiaryDto } from '../utils/dtos/beneficiary.dto'
 import { IBeneficiaryRepository } from '../utils/interfaces/repos.interfaces'
 import { EntityRepository, Repository } from 'typeorm'
+import { IBeneficiary } from 'src/utils/interfaces/entities.interfaces'
 
 @EntityRepository(Beneficiary)
 export default class BeneficiaryRepository
@@ -26,5 +27,19 @@ export default class BeneficiaryRepository
         })
 
         return beneficiaries
+    }
+
+    async findOneWithUserId(
+        userId: string,
+        beneficiaryId: string
+    ): Promise<IBeneficiary | undefined> {
+        const beneficiary = await this.findOne({
+            where: {
+                userId,
+                id: beneficiaryId,
+            },
+        })
+
+        return beneficiary
     }
 }
