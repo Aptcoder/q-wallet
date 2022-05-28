@@ -24,4 +24,22 @@ export default (beneficiaryService: IBeneficiaryService) => ({
             return processError(res, err)
         }
     },
+
+    async getAll(req: reqWithUser, res: Response) {
+        try {
+            const { id: userId } = req.user
+            const beneficiaries = await beneficiaryService.getBeneficiaries(
+                userId
+            )
+            return res.send({
+                status: 'success',
+                message: 'Beneficiaries',
+                data: {
+                    beneficiaries,
+                },
+            })
+        } catch (err) {
+            return processError(res, err)
+        }
+    },
 })

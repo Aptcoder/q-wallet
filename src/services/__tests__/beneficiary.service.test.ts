@@ -18,6 +18,10 @@ describe('Beneficiary service', () => {
         createAndSave(createBeneficiaryDto: CreateBeneficiaryDto) {
             return Promise.resolve({})
         },
+
+        findByUserId(userId: string) {
+            return Promise.resolve([])
+        },
     }
 
     const paymentServiceMock: IPaymentService = {
@@ -77,5 +81,15 @@ describe('Beneficiary service', () => {
             expect(verifyAccountSpy).toHaveBeenCalled()
             expect(createAndSaveSpy).not.toHaveBeenCalled()
         }
+    })
+
+    it('Should fetch beneficiaries using repo by userId', async () => {
+        const findByUserIdSpy = jest.spyOn(
+            mockBeneficiaryRepository,
+            'findByUserId'
+        )
+        const result = await beneficiaryService.getBeneficiaries('2')
+
+        expect(findByUserIdSpy).toHaveBeenCalledWith('2')
     })
 })

@@ -31,4 +31,9 @@ export default class BeneficiaryService implements IBeneficiaryService {
         })
         return beneficiary
     }
+
+    async getBeneficiaries(userId: string): Promise<any[]> {
+        const result = await this.beneficiaryRepository.findByUserId(userId)
+        return result
+    }
 }

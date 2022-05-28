@@ -17,4 +17,14 @@ export default class BeneficiaryRepository
         beneficiary = await this.save(beneficiary)
         return beneficiary
     }
+
+    async findByUserId(userId: string) {
+        const beneficiaries = await this.find({
+            where: {
+                userId,
+            },
+        })
+
+        return beneficiaries
+    }
 }

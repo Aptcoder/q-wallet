@@ -9,6 +9,10 @@ describe('Beneficiary controller', () => {
         createBeneficiary(userId: string, verifyAccountDto: VerifyAccountDto) {
             return Promise.resolve({})
         },
+
+        getBeneficiaries(userId: string) {
+            return Promise.resolve([])
+        },
     }
 
     const beneficiaryController = BeneficiaryController(mockBeneficiaryService)
@@ -24,6 +28,10 @@ describe('Beneficiary controller', () => {
         }),
         send: jest.fn(),
     } as unknown as Response
+
+    afterEach(() => {
+        jest.clearAllMocks()
+    })
 
     it('Should call createBeneficiaryy on service when create', async () => {
         const createBeneficiarySpy = jest.spyOn(
@@ -43,5 +51,25 @@ describe('Beneficiary controller', () => {
         expect(createBeneficiarySpy).toHaveBeenCalled()
         expect(mockRes.status).toHaveBeenCalledWith(201)
         expect(mockRes.send).toHaveBeenCalled()
+    })
+
+    it('Should call service function to get all beneficiaries', async () => {
+        const getBeneficiariesSpy = jest.spyOn(
+            mockBeneficiaryService,
+            'getBeneficiaries'
+        )
+
+        await beneficiaryController.getAll(mockReq as reqWithUser, mockRes)
+        expect(getBeneficiariesSpy).toHaveBeenCalled()
+        expect(mockRes.send).toHaveBeenCalled()
+        expect(mockRes.send).toHaveBeenCalledWith(
+            expect.objectContaining({
+                status: 'success',
+                message: 'Beneficiaries',
+                data: expect.objectContaining({
+                    beneficiaries: expect.any(Array),
+                }),
+            })
+        )
     })
 })

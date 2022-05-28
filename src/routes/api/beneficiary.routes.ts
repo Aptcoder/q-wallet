@@ -25,5 +25,7 @@ beneficiaryRouter.post(
     validateRequest(createBeneficiaryBodySchema),
     beneficiaryController.create
 )
+
+beneficiaryRouter.get('/', auth, beneficiaryController.getAll)
 // router.get('/:userId', userController.getUser);
 export default beneficiaryRouter

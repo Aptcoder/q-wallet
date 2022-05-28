@@ -42,4 +42,5 @@ export interface IBeneficiaryRepository {
         createBeneficiaryDto: CreateBeneficiaryDto,
         manager?: EntityManager
     ): Promise<{}>
+    findByUserId(userId: string): Promise<any[]>
 }

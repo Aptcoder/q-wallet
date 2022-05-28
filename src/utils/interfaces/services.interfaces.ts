@@ -62,4 +62,6 @@ export interface IBeneficiaryService {
         userId: string,
         verifyAccountDto: VerifyAccountDto
     ): Promise<{}>
+
+    getBeneficiaries(userId: string): Promise<any[]>
 }
