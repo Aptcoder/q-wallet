@@ -1,7 +1,7 @@
 import express from 'express'
 import request from 'supertest'
 import { getConnection, getManager, QueryRunner } from 'typeorm'
-import { init } from '../../src/loaders'
+import { init } from '../../loaders'
 import { faker } from '@faker-js/faker'
 import bcrypt from 'bcrypt'
 

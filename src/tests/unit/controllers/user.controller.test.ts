@@ -1,5 +1,5 @@
-import { IUserService } from '../../utils/interfaces/services.interfaces'
-import UserController from '../user.controller'
+import { IUserService } from '../../../utils/interfaces/services.interfaces'
+import UserController from '../../../controllers/user.controller'
 import { Request, Response } from 'express'
 
 describe('User controller', () => {

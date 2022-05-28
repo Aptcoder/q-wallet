@@ -6,7 +6,7 @@ import {
     ITransactionRepository,
     IUserRepository,
 } from '../../utils/interfaces/repos.interfaces'
-import User from 'src/entities/user.entity'
+import User from '../../entities/user.entity'
 
 const account = new Account()
 

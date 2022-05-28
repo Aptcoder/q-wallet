@@ -1,11 +1,11 @@
-import { reqWithUser } from '../../utils/types'
-import { IAccountService } from '../../utils/interfaces/services.interfaces'
-import AccountController from '../account.controller'
+import { reqWithUser } from '../../../utils/types'
+import { IAccountService } from '../../../utils/interfaces/services.interfaces'
+import AccountController from '../../../controllers/account.controller'
 import { Response } from 'express'
-import Account from '../../entities/account.entity'
-import { TransactionCategory } from '../../entities/transaction.entity'
+import Account from '../../../entities/account.entity'
+import { TransactionCategory } from '../../../entities/transaction.entity'
 import { EntityManager } from 'typeorm'
-import { BankTransferDto } from '../../utils/dtos/account.dto'
+import { BankTransferDto } from '../../../utils/dtos/account.dto'
 
 describe('Account controller', () => {
     const mockAccountService: IAccountService = {

@@ -9,7 +9,7 @@ import {
     mockTransactionRepository,
 } from '../../mocks/repo.mocks'
 import { paymentServiceMock } from '../../mocks/service.mocks'
-import { TransactionCategory } from 'src/entities/transaction.entity'
+import { TransactionCategory } from '../../../entities/transaction.entity'
 
 describe('Account service', () => {
     it('A + B', () => {
