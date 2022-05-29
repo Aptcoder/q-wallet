@@ -1,6 +1,6 @@
 import axios from 'axios'
 import config from 'config'
-import { VerifyAccountDto } from 'src/utils/dtos/beneficiary.dto'
+import { PayoutDto, VerifyAccountDto } from 'src/utils/dtos/beneficiary.dto'
 import { BankTransferDto } from '../utils/dtos/account.dto'
 import { IPaymentService } from '../utils/interfaces/services.interfaces'
 
@@ -71,6 +71,48 @@ export default class PaymentService implements IPaymentService {
         } catch (err) {
             console.log('err', err)
             return { success: false, data: {} }
+        }
+    }
+
+    async payout(payoutDto: PayoutDto): Promise<{ success: boolean }> {
+        try {
+            const recepientResult = await axios.post(
+                'https://api.paystack.co/transferrecipient',
+                {
+                    account_number: payoutDto.bank_account,
+                    bank_code: payoutDto.bank_code,
+                    type: 'nuban',
+                    name: `${payoutDto.bank_code}-${payoutDto.bank_account}`,
+                },
+                {
+                    headers: {
+                        Authorization: 'Bearer ' + config.get('pstk_secret'),
+                    },
+                }
+            )
+            console.log(recepientResult)
+            const transferResult = await axios.post(
+                'https://api.paystack.co/transfer',
+                {
+                    source: 'balance',
+                    reason: 'Withdrawal from q-wallet',
+                    amount: payoutDto.amount,
+                    recipient: recepientResult.data.data.recipient_code,
+                },
+                {
+                    headers: {
+                        Authorization: 'Bearer ' + config.get('pstk_secret'),
+                    },
+                }
+            )
+
+            console.log(transferResult)
+            return {
+                success: true,
+            }
+        } catch (err) {
+            console.log(err)
+            return { success: false }
         }
     }
 }

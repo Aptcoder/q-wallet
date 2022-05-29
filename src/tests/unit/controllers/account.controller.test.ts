@@ -1,76 +1,11 @@
 import { reqWithUser } from '../../../utils/types'
-import { IAccountService } from '../../../utils/interfaces/services.interfaces'
 import AccountController from '../../../controllers/account.controller'
 import { Response } from 'express'
-import Account from '../../../entities/account.entity'
-import { TransactionCategory } from '../../../entities/transaction.entity'
-import { EntityManager } from 'typeorm'
-import { BankTransferDto } from '../../../utils/dtos/account.dto'
+import { mockAccountService } from '../../../tests/mocks/service.mocks'
+import { mockReq, mockRes } from '../../../tests/mocks/util.mocks'
 
 describe('Account controller', () => {
-    const mockAccountService: IAccountService = {
-        getBalance(email: string) {
-            return Promise.resolve(2)
-        },
-
-        withdraw() {
-            return Promise.resolve({})
-        },
-
-        fundWithTransfer(bankTransferDto: BankTransferDto) {
-            return Promise.resolve({
-                bank_account: '0816352728',
-                bank_name: 'WEMA BANK',
-                account_name: 'Q wallet',
-            })
-        },
-
-        creditAccount(
-            userId: string,
-            creditAccount: number,
-            manager: EntityManager,
-            transactionDetails?: {
-                narration: string
-                category: TransactionCategory
-            }
-        ) {
-            return Promise.resolve(new Account())
-        },
-        debitAccount(
-            userId: string,
-            creditAccount: number,
-            manager: EntityManager,
-            transactionDetails?: {
-                narration: string
-                category: TransactionCategory
-            }
-        ) {
-            return Promise.resolve(new Account())
-        },
-        transfer(
-            creditUserId: string,
-            debitUserId: string,
-            amount: number,
-            narration: string
-        ) {
-            return Promise.resolve(new Account())
-        },
-    }
-
     let accountController = AccountController(mockAccountService)
-
-    const mockReq = {
-        user: {
-            email: 'sample@gmail.com',
-        },
-    } as unknown
-
-    const mockRes = {
-        status: jest.fn(() => {
-            return mockRes
-        }),
-        send: jest.fn(),
-    } as unknown as Response
 
     beforeEach(() => {
         jest.clearAllMocks()
@@ -148,5 +83,23 @@ describe('Account controller', () => {
                 status: 'failed',
             })
         )
+    })
+
+    it('Should call withdraw on account service on withdraw', async () => {
+        const withDrawSpy = jest.spyOn(mockAccountService, 'withdraw')
+
+        const withdrawReq = {
+            ...(mockReq as object),
+            query: {},
+            body: {
+                beneficiary: 'beneficiaryId',
+                amount: 5000,
+            },
+        } as unknown
+
+        await accountController.withdraw(withdrawReq as reqWithUser, mockRes)
+
+        expect(withDrawSpy).toHaveBeenCalled()
+        expect(withDrawSpy).toHaveBeenCalledWith('3', 'beneficiaryId', 5000)
     })
 })

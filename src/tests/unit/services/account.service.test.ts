@@ -1,6 +1,6 @@
 import { EntityManager } from 'typeorm'
 import Account from '../../../entities/account.entity'
-import { ConflictError, NotFoundError } from '../../../utils/errors'
+import { APIError, ConflictError, NotFoundError } from '../../../utils/errors'
 import { IAccountService } from '../../../utils/interfaces/services.interfaces'
 import AccountService from '../../../services/account.services'
 import {
@@ -191,7 +191,7 @@ describe('Account service', () => {
             'findOneWithUserId'
         )
 
-        await accountService.withdraw('2', 'beneficiaryId')
+        await accountService.withdraw('2', 'beneficiaryId', 5000)
         expect(findOneWithUserId).toHaveBeenCalled()
         expect(findOneWithUserId).toHaveBeenCalledWith('2', 'beneficiaryId')
     })
@@ -202,7 +202,7 @@ describe('Account service', () => {
             'findOneWithUserId'
         )
 
-        await accountService.withdraw('2', 'beneficiaryId')
+        await accountService.withdraw('2', 'beneficiaryId', 5000)
         expect(findOneWithUserId).toHaveBeenCalled()
         expect(findOneWithUserId).toHaveBeenCalledWith('2', 'beneficiaryId')
     })
@@ -213,7 +213,7 @@ describe('Account service', () => {
             .mockImplementation(() => Promise.resolve(undefined))
 
         try {
-            await accountService.withdraw('2', 'beneficiaryId')
+            await accountService.withdraw('2', 'beneficiaryId', 5000)
         } catch (err) {
             expect(err).toBeInstanceOf(NotFoundError)
         }
@@ -234,7 +234,7 @@ describe('Account service', () => {
 
         const payoutSpy = jest.spyOn(paymentServiceMock, 'payout')
 
-        await accountService.withdraw('2', 'beneficiaryId')
+        await accountService.withdraw('2', 'beneficiaryId', 5000)
 
         expect(payoutSpy).toBeCalled()
         expect(payoutSpy).toHaveBeenCalledWith(
@@ -243,5 +243,47 @@ describe('Account service', () => {
                 bank_code: '044',
             })
         )
+    })
+
+    it('Should throw error if payment service payout function return success false', async () => {
+        // const findOneWithUserId = jest
+        //     .spyOn(mockBeneficiaryRepository, 'findOneWithUserId')
+        //     .mockImplementation(() =>
+        //         Promise.resolve({
+        //             bank_account: '083267322',
+        //             bank_code: '044',
+        //         })
+        //     )
+
+        const payoutSpy = jest
+            .spyOn(paymentServiceMock, 'payout')
+            .mockImplementation(() =>
+                Promise.resolve({
+                    success: false,
+                })
+            )
+
+        try {
+            await accountService.withdraw('2', 'beneficiaryId', 5000)
+        } catch (err) {
+            expect(err).toBeInstanceOf(APIError)
+        }
+
+        expect(payoutSpy).toBeCalled()
+    })
+
+    it('Should debit user when withdraw function', async () => {
+        const debitAccountSpy = jest.spyOn(accountService, 'debitAccount')
+        const payoutSpy = jest
+            .spyOn(paymentServiceMock, 'payout')
+            .mockImplementation(() =>
+                Promise.resolve({
+                    success: true,
+                })
+            )
+
+        await accountService.withdraw('2', 'bemeficiaryId', 5000)
+
+        expect(debitAccountSpy).toHaveBeenCalled()
     })
 })

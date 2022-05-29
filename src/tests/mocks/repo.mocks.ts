@@ -21,6 +21,11 @@ export const mockAccountRepository: IAccountRepository = {
     updateBalance(account, amount, inc): Promise<Account> {
         return Promise.resolve(account)
     },
+    manager: {
+        transaction: (callback: () => {}) => {
+            callback()
+        },
+    },
 }
 
 const transaction = new Transaction()

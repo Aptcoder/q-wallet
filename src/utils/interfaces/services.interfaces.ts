@@ -4,7 +4,7 @@ import { EntityManager } from 'typeorm'
 import Account from '../../entities/account.entity'
 import { AuthUserDto, CreateUserDto } from '../dtos/users.dto'
 import { BankTransferDto } from '../dtos/account.dto'
-import { VerifyAccountDto } from '../dtos/beneficiary.dto'
+import { PayoutDto, VerifyAccountDto } from '../dtos/beneficiary.dto'
 
 export interface IUserService {
     create(createUserDto: CreateUserDto): any
@@ -16,7 +16,7 @@ export interface IUserService {
 
 export interface IAccountService {
     getBalance(userId: string): Promise<number>
-    withdraw(userId: string, beneficiaryId: string): Promise<{}>
+    withdraw(userId: string, beneficiaryId: string, amount: number): Promise<{}>
     fundWithTransfer(bankTransferDto: BankTransferDto): Promise<{}>
     transfer(
         creditUserId: string,
@@ -56,7 +56,7 @@ export interface IPaymentService {
             bank_name?: string
         }
     }>
-    payout(payoutDto: VerifyAccountDto): Promise<{
+    payout(payoutDto: PayoutDto): Promise<{
         success: boolean
     }>
 }

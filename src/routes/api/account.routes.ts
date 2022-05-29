@@ -10,8 +10,8 @@ import {
     fundAccountBody,
     makeTransferBodySchema,
 } from '../../schemas/account.schema'
-import { IPaymentService } from '../../utils/interfaces/services.interfaces'
 import PaymentService from '../../services/payment.service'
+import BeneficiaryRepository from '../../repositories/beneficiary.repository'
 
 const accountsRouter: Router = Router()
 const accountRouter: Router = Router()
@@ -21,13 +21,16 @@ const accountRepository =
 const transactionRepository = getConnection('q-wallet').getCustomRepository(
     TransactionRepository
 )
-
+const beneficiaryRepository = getConnection('q-wallet').getCustomRepository(
+    BeneficiaryRepository
+)
 const paymentService = new PaymentService()
 
 const accountService = new AccountService(
     accountRepository,
     transactionRepository,
-    paymentService
+    paymentService,
+    beneficiaryRepository
 )
 
 const accountController = AccountController(accountService)
@@ -44,6 +47,8 @@ accountRouter.post(
     validateRequest(fundAccountBody),
     accountController.fundAccount
 )
+
+accountRouter.post('/withdraw', auth, accountController.withdraw)
 // // router.get('/:userId', userController.getUser);
 // accountRouter.post('/fund', auth, accountController.initiateCardFunding);
 // accountRouter.post('/fund/validate', auth, accountController.validateFunding);

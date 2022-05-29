@@ -6,6 +6,7 @@ import AccountRepository from '../../repositories/account.repository'
 import PaymentService from '../../services/payment.service'
 import User from '../../entities/user.entity'
 import { TransactionCategory } from '../../entities/transaction.entity'
+import BeneficiaryRepository from '../../repositories/beneficiary.repository'
 
 const webhookRouter = Router()
 
@@ -26,13 +27,17 @@ webhookRouter.post('/flutterwave', async (req, res) => {
             const transactionRepository = connection.getCustomRepository(
                 TransactionRepository
             )
+            const beneficiaryRepository = getConnection(
+                'q-wallet'
+            ).getCustomRepository(BeneficiaryRepository)
 
             const paymentService = new PaymentService()
 
             const accountService = new AccountService(
                 accountRepository,
                 transactionRepository,
-                paymentService
+                paymentService,
+                beneficiaryRepository
             )
             return await connection.transaction(async (manager) => {
                 const user = await manager.findOne(User, {

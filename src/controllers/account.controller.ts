@@ -50,6 +50,27 @@ export default (accountService: IAccountService) => ({
         }
     },
 
+    async withdraw(req: reqWithUser, res: Response) {
+        try {
+            const { id: userId } = req.user
+            const { beneficiary, amount } = req.body
+            const result = await accountService.withdraw(
+                userId,
+                beneficiary,
+                amount
+            )
+
+            return res.send({
+                message:
+                    'Withdrawal initiated. Should take a couple of minutes',
+                status: 'success',
+                data: {},
+            })
+        } catch (err) {
+            return processError(res, err)
+        }
+    },
+
     async makeTransfer(
         req: reqWithUser,
         res: Response

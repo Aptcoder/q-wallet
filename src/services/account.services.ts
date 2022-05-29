@@ -6,7 +6,6 @@ import {
     ITransactionRepository,
 } from 'src/utils/interfaces/repos.interfaces'
 import Account from '../entities/account.entity'
-import User from '../entities/user.entity'
 import Transaction, {
     TransactionType,
     TransactionCategory,
@@ -334,7 +333,8 @@ export default class AccountService implements IAccountService {
                 400
             )
         }
-        const accountRepository = this.accountRepository as AccountRepository
+        const accountRepository = this
+            .accountRepository as unknown as AccountRepository
 
         const account = await accountRepository.manager.transaction(
             async (manager) => {
@@ -360,7 +360,11 @@ export default class AccountService implements IAccountService {
         return account
     }
 
-    async withdraw(userId: string, beneficiaryId: string): Promise<{}> {
+    async withdraw(
+        userId: string,
+        beneficiaryId: string,
+        amount: number
+    ): Promise<{}> {
         const beneficiary = await this.beneficiaryRepository.findOneWithUserId(
             userId,
             beneficiaryId
@@ -369,10 +373,33 @@ export default class AccountService implements IAccountService {
             throw new NotFoundError('Beneficiary not found')
         }
 
-        const result = this.paymentService.payout({
+        const result = await this.paymentService.payout({
             bank_code: beneficiary.bank_code,
             bank_account: beneficiary.bank_account,
+            amount,
         })
-        return {}
+
+        if (!result.success) {
+            throw new APIError('Can not process withdrawals currently', 500)
+        }
+        const accountRepository = this
+            .accountRepository as unknown as AccountRepository
+
+        const account = await accountRepository.manager.transaction(
+            async (manager) => {
+                const transactionDetails = {
+                    category: TransactionCategory.WITHDRAWAL,
+                    narration: `Withdrawal to ${beneficiary.account_name}`,
+                }
+                const account = await this.debitAccount(
+                    userId,
+                    amount,
+                    manager,
+                    transactionDetails
+                )
+                return account
+            }
+        )
+        return account
     }
 }

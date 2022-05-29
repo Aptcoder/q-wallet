@@ -7,6 +7,7 @@ import { CreateUserDto } from '../dtos/users.dto'
 import { CreateBeneficiaryDto } from '../dtos/beneficiary.dto'
 import Beneficiary from 'src/entities/beneficiary.entity'
 import { IBeneficiary } from './entities.interfaces'
+import { Callback } from 'mongoose'
 
 /* eslint-disable no-unused-vars */
 export interface IAccountRepository {
@@ -24,6 +25,9 @@ export interface IAccountRepository {
         type: 'inc' | 'dec',
         manager?: EntityManager
     ): Promise<Account>
+    manager: {
+        transaction: (callback: () => Promise<any>) => void
+    }
 }
 
 export interface IUserRepository {

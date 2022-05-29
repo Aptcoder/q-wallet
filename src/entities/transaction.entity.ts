@@ -3,9 +3,7 @@
 import {
     Column,
     Entity,
-    OneToOne,
     PrimaryGeneratedColumn,
-    JoinColumn,
     Generated,
     ManyToOne,
     BaseEntity,
@@ -22,6 +20,7 @@ export enum TransactionCategory {
     WALLET_TRANSFER = 'wallet_transfer',
     CARD_FUNDING = 'card_funding',
     TRANSFER_FUNDING = 'transfer_funding',
+    WITHDRAWAL = 'withdrawal',
 }
 
 @Entity()
