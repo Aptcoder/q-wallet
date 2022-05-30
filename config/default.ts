@@ -8,7 +8,7 @@ export default {
     dbHost: 'localhost',
     dbName: 'q-wallet',
     dbPort: 5342,
-    dbPassword: 'wonderful.',
+    dbPassword: process.env.DB_PASSWORD,
     dbUsername: 'postgres',
     jwtSecret: process.env.JWT_SECRET,
     flw_secret: process.env.FLW_SECRET,
