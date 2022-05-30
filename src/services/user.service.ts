@@ -1,5 +1,3 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-underscore-dangle */
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
 import Account from '../entities/account.entity'
@@ -10,14 +8,6 @@ import User from 'src/entities/user.entity'
 import config from 'config'
 import jwt from 'jsonwebtoken'
 import { IUserService } from 'src/utils/interfaces/services.interfaces'
-
-interface UserDataInterface {
-    firstName: string
-    lastName: string
-    email: string
-    password: string
-    phoneNumber: string
-}
 
 export default class UserService implements IUserService {
     constructor(private userRepository: IUserRepository) {

@@ -1,4 +1,4 @@
-import { getConnection, EntityManager } from 'typeorm'
+import { EntityManager } from 'typeorm'
 import { randomUUID } from 'crypto'
 import {
     IAccountRepository,
@@ -6,7 +6,7 @@ import {
     ITransactionRepository,
 } from 'src/utils/interfaces/repos.interfaces'
 import Account from '../entities/account.entity'
-import Transaction, {
+import {
     TransactionType,
     TransactionCategory,
 } from '../entities/transaction.entity'
@@ -30,59 +30,6 @@ export default class AccountService implements IAccountService {
         this.paymentService = paymentService
         this.beneficiaryRepository = beneficiaryRepository
     }
-
-    // private static processCardPaymentResult(result: any) {
-    //   if (result.status !== 'success') {
-    //     return {
-    //       creditAccount: false,
-    //       success: false,
-    //       nextAction: 'Could not charge card',
-    //       status: 'FAILED'
-    //     };
-    //   }
-
-    //   // is the next stage to submit otp;
-    //   if (result.meta) {
-    //     const { authorization } = result.meta;
-    //     const { mode } = authorization;
-    //     console.log('autho', mode);
-    //     if (mode === 'otp') {
-    //       return {
-    //         creditAccount: false,
-    //         success: true,
-    //         nextAction: 'Submit OTP',
-    //         status: 'SUBMIT_OTP'
-    //       };
-    //     }
-    //     if (mode === 'pin') {
-    //       return {
-    //         creditAccount: false,
-    //         success: true,
-    //         nextAction: 'Submit PIN',
-    //         status: 'PIN_REQUIRED'
-    //       };
-    //     }
-    //   }
-
-    //   if (result.data) {
-    //     const { status } = result.data;
-    //     if (status === 'successful') {
-    //       return {
-    //         creditAccount: true,
-    //         success: true,
-    //         nextAction: 'Credit Account',
-    //         status: 'COMPLETED'
-    //       };
-    //     }
-    //   }
-
-    //   return {
-    //     creditAccount: false,
-    //     success: false,
-    //     nextAction: 'Could not charge card',
-    //     status: 'FAILED'
-    //   };
-    // }
 
     public async getBalance(userId: string) {
         const account: Account | undefined =
@@ -112,129 +59,6 @@ export default class AccountService implements IAccountService {
         }
         return result.data
     }
-
-    // public async initiateCardFunding(
-    //   userEmail: string,
-    //   card: {
-    //     cvv: string,
-    //     card_number: string,
-    //     expiry_month: string,
-    //     pin: string,
-    //     expiry_year: string
-    //   },
-    //   amount: number
-    // ) {
-    //   const user = await this.connection.getRepository(User).findOne({
-    //     where: {
-    //       email: userEmail
-    //     }
-    //   });
-
-    //   if (!user) {
-    //     throw new ServiceError({ status: 404, message: 'User not found ' });
-    //   }
-
-    //   const account = await this.connection.getRepository(Account).findOne({
-    //     where: {
-    //       user: user.id
-    //     }
-    //   });
-
-    //   if (!account) {
-    //     throw new ServiceError({ status: 404, message: 'Account not found ' });
-    //   }
-    //   const randRef = randomUUID();
-    //   const payload = {
-    //     ...card,
-    //     tx_ref: randRef,
-    //     fullname: `${user.firstName} ${user.lastName}`,
-    //     email: user.email,
-    //     amount
-    //   };
-    //   const result = await paymentService.initiateCardPayment(payload);
-    //   const processedResult = AccountService.processCardPaymentResult(result);
-    //   if (!processedResult.success) {
-    //     throw new ServiceError({ status: 400, message: processedResult.nextAction as string });
-    //   }
-
-    //   if (processedResult.nextAction === 'Submit PIN') {
-    //     return {
-    //       message: 'Submit card pin to continue',
-    //       status: processedResult.status
-    //     };
-    //   }
-
-    //   const transaction = new Transaction();
-    //   transaction.category = TransactionCategory.CARD_FUNDING;
-    //   transaction.narration = 'CARDFD_';
-    //   transaction.amount = amount;
-    //   transaction.balance_before = account.balance;
-    //   transaction.balance_after = account.balance + Number(amount);
-    //   transaction.account = account;
-    //   transaction.type = TransactionType.CREDIT;
-    //   transaction.meta_data = JSON.stringify({
-    //     response: result.message
-    //   });
-    //   transaction.reference = randRef;
-    //   transaction.ext_reference = (result.data ? result.data.flw_ref : null) as string;
-    //   transaction.last_ext_response = (result.data ? result.data.status : 'pending') as string;
-
-    //   await this.connection.getRepository(Transaction).save(transaction);
-
-    //   return {
-    //     message: processedResult.nextAction,
-    //     status: processedResult.status,
-    //     data: {
-    //       transaction
-    //     }
-    //   };
-    // }
-
-    // public async validateFunding(txRef: string, otp: string, user: any) {
-    //   const { accountId } = user;
-    //   const transaction = await this.connection.getRepository(Transaction).findOne({
-    //     where: {
-    //       reference: txRef,
-    //       account: accountId
-    //     },
-    //     relations: ['account']
-    //   });
-
-    //   if (!transaction) {
-    //     throw new ServiceError({ status: 404, message: 'Transaction not found ' });
-    //   }
-    //   const result = await paymentService.validateCharge(transaction.ext_reference, otp);
-    //   if (result.status !== 'success') {
-    //     throw new ServiceError({ status: 400, message: 'Could not validate charge' });
-    //   }
-
-    //   await this.connection.getRepository(Transaction).update({
-    //     reference: transaction.reference
-    //   }, {
-    //     last_ext_response: result.data.status as string
-    //   });
-
-    //   await this.connection.transaction(async (manager) => {
-    //     await manager.update(Transaction, {
-    //       reference: transaction.reference
-    //     }, {
-    //       last_ext_response: result.data.status as string
-    //     });
-
-    //     await AccountService.creditAccount(
-    //       transaction.account,
-    //       transaction.amount,
-    //       manager
-    //     );
-    //   });
-
-    //   return {
-    //     message: 'Charge completed',
-    //     data: {
-    //       transaction
-    //     }
-    //   };
-    // }
 
     public async creditAccount(
         userId: string,
