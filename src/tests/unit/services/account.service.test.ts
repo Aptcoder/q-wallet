@@ -46,29 +46,24 @@ describe('Account service', () => {
         const findOneSpy = jest
             .spyOn(mockAccountRepository, 'findOne')
             .mockImplementation(() => Promise.resolve(undefined))
-        try {
+        expect(async () => {
             await accountService.getBalance('sample')
-        } catch (err) {
-            expect(err).toBeInstanceOf(NotFoundError)
-            expect(findOneSpy).toHaveBeenCalled()
-        }
+        }).rejects.toBeInstanceOf(NotFoundError)
+        expect(findOneSpy).toHaveBeenCalled()
     })
 
     it('Should throw account not found if not found in credit account function', async () => {
         const findUserByIdSpy = jest
             .spyOn(mockAccountRepository, 'findByUserId')
             .mockImplementation(() => Promise.resolve(undefined))
-        try {
-            const manager = {} as EntityManager
-
+        const manager = {} as EntityManager
+        expect(async () => {
             await accountService.creditAccount('sample', 2, manager, {
                 narration: 'Transfer test',
                 category: TransactionCategory.WALLET_TRANSFER,
             })
-        } catch (err) {
-            expect(err).toBeInstanceOf(NotFoundError)
-            expect(findUserByIdSpy).toHaveBeenCalled()
-        }
+        }).rejects.toBeInstanceOf(NotFoundError)
+        expect(findUserByIdSpy).toHaveBeenCalled()
     })
 
     it('Should credit account', async () => {
@@ -105,17 +100,14 @@ describe('Account service', () => {
         const findUserByIdSpy = jest
             .spyOn(mockAccountRepository, 'findByUserId')
             .mockImplementation(() => Promise.resolve(undefined))
-        try {
-            const manager = {} as EntityManager
-
+        const manager = {} as EntityManager
+        expect(async () => {
             await accountService.debitAccount('sample', 2, manager, {
                 narration: 'Transfer test',
                 category: TransactionCategory.WALLET_TRANSFER,
             })
-        } catch (err) {
-            expect(err).toBeInstanceOf(NotFoundError)
-            expect(findUserByIdSpy).toHaveBeenCalled()
-        }
+        }).rejects.toBeInstanceOf(NotFoundError)
+        expect(findUserByIdSpy).toHaveBeenCalled()
     })
 
     it('Should throw insuffience balance if balance less than amount debit account function', async () => {
@@ -124,17 +116,14 @@ describe('Account service', () => {
         const findUserByIdSpy = jest
             .spyOn(mockAccountRepository, 'findByUserId')
             .mockImplementation(() => Promise.resolve(account))
-        try {
-            const manager = {} as EntityManager
-
+        const manager = {} as EntityManager
+        expect(async () => {
             await accountService.debitAccount('sample', 2000, manager, {
                 narration: 'Transfer test',
                 category: TransactionCategory.WALLET_TRANSFER,
             })
-        } catch (err) {
-            expect(err).toBeInstanceOf(ConflictError)
-            expect(findUserByIdSpy).toHaveBeenCalled()
-        }
+        }).rejects.toBeInstanceOf(ConflictError)
+        expect(findUserByIdSpy).toHaveBeenCalled()
     })
 
     it('Should debit account', async () => {
@@ -211,12 +200,9 @@ describe('Account service', () => {
         const findOneWithUserId = jest
             .spyOn(mockBeneficiaryRepository, 'findOneWithUserId')
             .mockImplementation(() => Promise.resolve(undefined))
-
-        try {
+        expect(async () => {
             await accountService.withdraw('2', 'beneficiaryId', 5000)
-        } catch (err) {
-            expect(err).toBeInstanceOf(NotFoundError)
-        }
+        }).rejects.toBeInstanceOf(NotFoundError)
 
         expect(findOneWithUserId).toHaveBeenCalled()
         expect(findOneWithUserId).toHaveBeenCalledWith('2', 'beneficiaryId')
@@ -246,30 +232,19 @@ describe('Account service', () => {
     })
 
     it('Should throw error if payment service payout function return success false', async () => {
-        // const findOneWithUserId = jest
-        //     .spyOn(mockBeneficiaryRepository, 'findOneWithUserId')
-        //     .mockImplementation(() =>
-        //         Promise.resolve({
-        //             bank_account: '083267322',
-        //             bank_code: '044',
-        //         })
-        //     )
-
         const payoutSpy = jest
             .spyOn(paymentServiceMock, 'payout')
             .mockImplementation(() =>
                 Promise.resolve({
                     success: false,
+                    data: {
+                        reference: null,
+                    },
                 })
             )
-
-        try {
+        expect(async () => {
             await accountService.withdraw('2', 'beneficiaryId', 5000)
-        } catch (err) {
-            expect(err).toBeInstanceOf(APIError)
-        }
-
-        expect(payoutSpy).toBeCalled()
+        }).rejects.toBeInstanceOf(APIError)
     })
 
     it('Should debit user when withdraw function', async () => {
@@ -279,6 +254,9 @@ describe('Account service', () => {
             .mockImplementation(() =>
                 Promise.resolve({
                     success: true,
+                    data: {
+                        reference: null,
+                    },
                 })
             )
 

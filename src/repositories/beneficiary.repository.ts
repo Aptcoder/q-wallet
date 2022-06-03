@@ -42,4 +42,15 @@ export default class BeneficiaryRepository
 
         return beneficiary
     }
+
+    async findOneWithUserIdAndAccount(userId: string, account_number: string) {
+        const beneficiary = await this.findOne({
+            where: {
+                userId,
+                bank_account: account_number,
+            },
+        })
+
+        return beneficiary
+    }
 }

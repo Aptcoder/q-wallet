@@ -7,6 +7,8 @@ import PaymentService from '../../services/payment.service'
 import User from '../../entities/user.entity'
 import { TransactionCategory } from '../../entities/transaction.entity'
 import BeneficiaryRepository from '../../repositories/beneficiary.repository'
+import FlutterwaveStrategy from '../../services/payment_strategies/flutterwave.strategy'
+import config from 'config'
 
 const webhookRouter = Router()
 
@@ -31,7 +33,9 @@ webhookRouter.post('/flutterwave', async (req, res) => {
                 'q-wallet'
             ).getCustomRepository(BeneficiaryRepository)
 
-            const paymentService = new PaymentService()
+            const flw_strat = new FlutterwaveStrategy(config.get('flw_secret'))
+
+            const paymentService = new PaymentService(flw_strat)
 
             const accountService = new AccountService(
                 accountRepository,
@@ -76,4 +80,5 @@ webhookRouter.post('/flutterwave', async (req, res) => {
     }
 })
 
+webhookRouter.post('/paystack', async (req, res) => {})
 export default webhookRouter

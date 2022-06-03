@@ -17,6 +17,9 @@ import {
 import { APIError, ConflictError, NotFoundError } from '../utils/errors'
 import AccountRepository from '../repositories/account.repository'
 import { BankTransferDto } from '../utils/dtos/account.dto'
+import FlutterwaveStrategy from './payment_strategies/flutterwave.strategy'
+import config from 'config'
+import PaystackStrategy from './payment_strategies/paystack.strategy'
 
 export default class AccountService implements IAccountService {
     constructor(
@@ -48,6 +51,8 @@ export default class AccountService implements IAccountService {
         bankTransferDto: BankTransferDto
     ): Promise<{}> {
         const tx_ref = randomUUID()
+        const flw_strat = new FlutterwaveStrategy(config.get('flw_secret'))
+        this.paymentService.setStrategy(flw_strat)
         const result = await this.paymentService.chargeWithTransfer({
             reference: tx_ref,
             email: bankTransferDto.email,
@@ -197,21 +202,26 @@ export default class AccountService implements IAccountService {
             throw new NotFoundError('Beneficiary not found')
         }
 
+        const pst_strat = new PaystackStrategy(config.get('pstk_secret'))
+        this.paymentService.setStrategy(pst_strat)
         const result = await this.paymentService.payout({
             bank_code: beneficiary.bank_code,
             bank_account: beneficiary.bank_account,
             amount,
         })
-
+        console.log('r', result)
+        console.log('Gets here?')
         if (!result.success) {
             throw new APIError('Can not process withdrawals currently', 500)
         }
+        console.log('what about here')
         const accountRepository = this
             .accountRepository as unknown as AccountRepository
 
         const account = await accountRepository.manager.transaction(
             async (manager) => {
                 const transactionDetails = {
+                    ext_reference: result.data.reference,
                     category: TransactionCategory.WITHDRAWAL,
                     narration: `Withdrawal to ${beneficiary.account_name}`,
                 }

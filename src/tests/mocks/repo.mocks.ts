@@ -50,6 +50,9 @@ export const mockBeneficiaryRepository: IBeneficiaryRepository = {
             bank_code: '044',
         })
     },
+    findOneWithUserIdAndAccount() {
+        return Promise.resolve(undefined)
+    },
 }
 
 const sample_user = {

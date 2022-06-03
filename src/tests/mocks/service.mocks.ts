@@ -19,11 +19,16 @@ export const paymentServiceMock: IPaymentService = {
     payout() {
         return Promise.resolve({
             success: true,
+            data: {
+                reference: null,
+            },
         })
     },
     verifyAccount() {
         return Promise.resolve({ success: true, data: {} })
     },
+
+    setStrategy() {},
 }
 
 export const mockBeneficiaryService: IBeneficiaryService = {

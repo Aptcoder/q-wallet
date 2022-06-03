@@ -58,6 +58,31 @@ export interface IPaymentService {
     }>
     payout(payoutDto: PayoutDto): Promise<{
         success: boolean
+        data: {
+            reference: string | null
+        }
+    }>
+
+    setStrategy(strategy: IPaymentStrategy): void
+}
+
+export interface IPaymentStrategy {
+    chargeWithTransfer(bankTransferDto: BankTransferDto): Promise<{
+        success: boolean
+        data: {}
+    }>
+    verifyAccount(verifyAccount: VerifyAccountDto): Promise<{
+        success: boolean
+        data: {
+            account_name?: string
+            bank_name?: string
+        }
+    }>
+    payout(payoutDto: PayoutDto): Promise<{
+        success: boolean
+        data: {
+            reference: string | null
+        }
     }>
 }
 

@@ -1,10 +1,12 @@
+import config from 'config'
 import { VerifyAccountDto } from '../utils/dtos/beneficiary.dto'
-import { APIError } from '../utils/errors'
+import { APIError, ConflictError } from '../utils/errors'
 import { IBeneficiaryRepository } from '../utils/interfaces/repos.interfaces'
 import {
     IBeneficiaryService,
     IPaymentService,
 } from '../utils/interfaces/services.interfaces'
+import PaystackStrategy from './payment_strategies/paystack.strategy'
 
 export default class BeneficiaryService implements IBeneficiaryService {
     constructor(
@@ -19,6 +21,16 @@ export default class BeneficiaryService implements IBeneficiaryService {
         userId: string,
         verifyAccountDto: VerifyAccountDto
     ): Promise<{}> {
+        const oldBeneficiary =
+            await this.beneficiaryRepository.findOneWithUserIdAndAccount(
+                userId,
+                verifyAccountDto.bank_account
+            )
+        if (oldBeneficiary) {
+            throw new ConflictError('Beneficiary already exists')
+        }
+        const pst_strat = new PaystackStrategy(config.get('pstk_secret'))
+        this.paymentService.setStrategy(pst_strat)
         const result = await this.paymentService.verifyAccount(verifyAccountDto)
         if (!result.success) {
             throw new APIError('Could not verify account details', 400)

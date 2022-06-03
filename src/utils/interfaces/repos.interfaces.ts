@@ -7,7 +7,6 @@ import { CreateUserDto } from '../dtos/users.dto'
 import { CreateBeneficiaryDto } from '../dtos/beneficiary.dto'
 import Beneficiary from 'src/entities/beneficiary.entity'
 import { IBeneficiary } from './entities.interfaces'
-import { Callback } from 'mongoose'
 
 /* eslint-disable no-unused-vars */
 export interface IAccountRepository {
@@ -52,5 +51,9 @@ export interface IBeneficiaryRepository {
     findOneWithUserId(
         userId: string,
         beneficiaryId: string
+    ): Promise<IBeneficiary | undefined>
+    findOneWithUserIdAndAccount(
+        userId: string,
+        account_number: string
     ): Promise<IBeneficiary | undefined>
 }

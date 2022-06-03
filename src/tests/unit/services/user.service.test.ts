@@ -40,12 +40,9 @@ describe('User service', () => {
 
     it('SHould throw error on create if user with email exists', async () => {
         const findByEmailSpy = jest.spyOn(mockUserRepository, 'findByEmail')
-        try {
+        expect(async () => {
             await userService.create({ ...sample_user })
-        } catch (err) {
-            expect(err).toBeInstanceOf(ConflictError)
-            expect(findByEmailSpy).toHaveBeenCalled()
-        }
+        }).rejects.toBeInstanceOf(ConflictError)
     })
 
     it('Should auth user if password correct', async () => {
@@ -82,15 +79,11 @@ describe('User service', () => {
             .mockImplementation(() => {
                 return Promise.resolve(undefined)
             })
-        try {
+        expect(async () => {
             const result = await userService.auth({
                 email: 'sample@gmail.com',
                 password: 'samplemilz',
             })
-        } catch (err: any) {
-            expect(err).toBeInstanceOf(NotFoundError)
-            expect(findByEmailSpy).toHaveBeenCalled()
-            expect(userService._comparePassword).not.toHaveBeenCalled()
-        }
+        }).rejects.toBeInstanceOf(NotFoundError)
     })
 })
