@@ -33,6 +33,9 @@ export const mockTransactionRepository: ITransactionRepository = {
     createAndSave({}) {
         return Promise.resolve(transaction)
     },
+    findById(transactionId: string) {
+        return Promise.resolve(transaction)
+    },
 }
 
 export const mockBeneficiaryRepository: IBeneficiaryRepository = {

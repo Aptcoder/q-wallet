@@ -9,6 +9,7 @@ import { TransactionCategory } from '../../entities/transaction.entity'
 import BeneficiaryRepository from '../../repositories/beneficiary.repository'
 import FlutterwaveStrategy from '../../services/payment_strategies/flutterwave.strategy'
 import config from 'config'
+import crypto from 'crypto'
 
 const webhookRouter = Router()
 
@@ -80,5 +81,20 @@ webhookRouter.post('/flutterwave', async (req, res) => {
     }
 })
 
-webhookRouter.post('/paystack', async (req, res) => {})
+webhookRouter.post('/paystack', async (req, res) => {
+    const hash = crypto
+        .createHmac('sha512', config.get('pstk_secret'))
+        .update(JSON.stringify(req.body))
+        .digest('hex')
+    if (hash !== req.headers['x-paystack-signature']) {
+        return res.status(401).send('Unknow origin')
+    }
+    const payload = req.body
+    if (payload.event === 'transfer.failed') {
+        const ext_reference = payload.data.reference
+        return res.send('Thanks for the transfer update')
+    }
+
+    return res.send("Don't know what this is for, but thanks anyways!")
+})
 export default webhookRouter

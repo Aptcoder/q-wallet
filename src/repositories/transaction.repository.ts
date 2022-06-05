@@ -15,13 +15,18 @@ export default class TransactionRepository
         let transaction = this.create(createTransactionDto)
 
         if (manager) {
-            console.log('using manager')
             await manager.save(Transaction, transaction)
             return transaction
         }
-        console.log('not using manager')
         transaction = await this.save(transaction)
 
+        return transaction
+    }
+
+    async findById(id: string) {
+        const transaction = await this.findOne({
+            id: Number(id),
+        })
         return transaction
     }
 }

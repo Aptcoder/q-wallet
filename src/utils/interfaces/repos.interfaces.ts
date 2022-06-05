@@ -40,6 +40,7 @@ export interface ITransactionRepository {
         createTransactionDto: Partial<CreateTransactionDto>,
         manager?: EntityManager
     ): Promise<Transaction>
+    findById(transactionId: string): Promise<Transaction | undefined>
 }
 
 export interface IBeneficiaryRepository {

@@ -47,6 +47,19 @@ export default class AccountService implements IAccountService {
         return account.balance
     }
 
+    public async reverseTransaction(transactionId: string) {
+        const transaction = await this.transactionRepository.findById(
+            transactionId
+        )
+        if (!transaction) {
+            throw new NotFoundError('Transaction not found')
+        }
+
+        // if (transaction.type === TransactionType.CREDIT ){
+        //     await this.creditAccount()
+        // }
+    }
+
     public async fundWithTransfer(
         bankTransferDto: BankTransferDto
     ): Promise<{}> {
@@ -94,7 +107,7 @@ export default class AccountService implements IAccountService {
         const transactionData = {
             amount: creditAmount,
             type: TransactionType.CREDIT,
-            accountId: account.id,
+            userId: account.userId,
             meta_data: transactionDetails.narration,
             balance_after: account.balance,
             balance_before: oldBalance,
@@ -136,7 +149,7 @@ export default class AccountService implements IAccountService {
         const transactionData = {
             amount: debitAmount,
             type: TransactionType.DEBIT,
-            accountId: account.id,
+            userId: account.userId,
             meta_data: transactionDetails.narration,
             balance_after: account.balance,
             balance_before: oldBalance,
@@ -209,12 +222,9 @@ export default class AccountService implements IAccountService {
             bank_account: beneficiary.bank_account,
             amount,
         })
-        console.log('r', result)
-        console.log('Gets here?')
         if (!result.success) {
             throw new APIError('Can not process withdrawals currently', 500)
         }
-        console.log('what about here')
         const accountRepository = this
             .accountRepository as unknown as AccountRepository
 

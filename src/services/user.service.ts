@@ -36,7 +36,7 @@ export default class UserService implements IUserService {
         const account = new Account()
         user.account = account
         user = await this.userRepository.save(user)
-        return user
+        return _.omit(user, ['password', 'account'])
     }
 
     public async auth(authUserDto: AuthUserDto) {

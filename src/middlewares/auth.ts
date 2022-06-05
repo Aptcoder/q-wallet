@@ -40,7 +40,6 @@ export async function auth(
         req.user = decoded
         return next()
     } catch (err) {
-        console.log('err', err)
         return res.status(403).send({
             message: 'Invalid token supplied',
             status: 'failed',

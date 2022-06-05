@@ -8,7 +8,6 @@ import {
     ManyToOne,
     BaseEntity,
 } from 'typeorm'
-import Account from './account.entity'
 import User from './user.entity'
 
 export enum TransactionType {
@@ -61,14 +60,14 @@ export default class Transaction extends BaseEntity {
     @Column()
     narration!: string
 
-    @ManyToOne(() => Account, {
+    @ManyToOne(() => User, {
         nullable: false,
         cascade: true,
     })
-    account!: Account
+    user!: User
 
     @Column({ nullable: false })
-    accountId!: number
+    userId!: number
 
     @Column({
         type: 'numeric',
