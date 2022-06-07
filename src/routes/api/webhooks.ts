@@ -1,7 +1,12 @@
 import { Router } from 'express'
 import TransactionRepository from '../../repositories/transaction.repository'
 import AccountService from '../../services/account.services'
-import { getConnection, getConnectionManager, getManager } from 'typeorm'
+import {
+    getConnection,
+    getConnectionManager,
+    getCustomRepository,
+    getManager,
+} from 'typeorm'
 import AccountRepository from '../../repositories/account.repository'
 import PaymentService from '../../services/payment.service'
 import User from '../../entities/user.entity'
@@ -92,6 +97,36 @@ webhookRouter.post('/paystack', async (req, res) => {
     const payload = req.body
     if (payload.event === 'transfer.failed') {
         const ext_reference = payload.data.reference
+        const connection = getConnection('q-wallet')
+        const accountRepository =
+            connection.getCustomRepository(AccountRepository)
+        const transactionRepository = connection.getCustomRepository(
+            TransactionRepository
+        )
+        const transaction = await transactionRepository.findOne({
+            ext_reference,
+        })
+        if (!transaction) {
+            return res.status(404).send('Oops, not sure how to handle this one')
+        }
+
+        const beneficiaryRepository = connection.getCustomRepository(
+            BeneficiaryRepository
+        )
+
+        const flw_strat = new FlutterwaveStrategy(config.get('flw_secret'))
+
+        const paymentService = new PaymentService(flw_strat)
+
+        const accountService = new AccountService(
+            accountRepository,
+            transactionRepository,
+            paymentService,
+            beneficiaryRepository
+        )
+
+        await accountService.reverseTransaction(String(transaction.id))
+
         return res.send('Thanks for the transfer update')
     }
 

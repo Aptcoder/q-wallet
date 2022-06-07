@@ -55,9 +55,35 @@ export default class AccountService implements IAccountService {
             throw new NotFoundError('Transaction not found')
         }
 
-        // if (transaction.type === TransactionType.CREDIT ){
-        //     await this.creditAccount()
-        // }
+        if (transaction.type === TransactionType.DEBIT) {
+            const accountRepository = this
+                .accountRepository as unknown as AccountRepository
+            return accountRepository.manager.transaction(async (manager) => {
+                return await this.creditAccount(
+                    String(transaction.userId),
+                    transaction.amount,
+                    manager,
+                    {
+                        narration: 'Reversal',
+                        category: TransactionCategory.WALLET_TRANSFER,
+                    }
+                )
+            })
+        } else {
+            const accountRepository = this
+                .accountRepository as unknown as AccountRepository
+            return accountRepository.manager.transaction(async (manager) => {
+                return await this.debitAccount(
+                    String(transaction.userId),
+                    transaction.amount,
+                    manager,
+                    {
+                        narration: 'Reversal',
+                        category: TransactionCategory.WALLET_TRANSFER,
+                    }
+                )
+            })
+        }
     }
 
     public async fundWithTransfer(
