@@ -29,3 +29,6 @@ Thinking of spinning this up?
     - create a .env file and fill it with the variables mentioned in env.sample
     - run migration command `npm run typeorm -- migration:run`
 4. Start server or dev server with `npm run start` or `npm run start:dev`
+
+API Documentation
+Documentation is still a WIP and can be found here: https://documenter.getpostman.com/view/11384363/Uz5GpGGp
