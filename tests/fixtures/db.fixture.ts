@@ -9,27 +9,47 @@ export async function seeDb() {
     const hashedPassword = await bcrypt.hash('samueluser.', 10)
 
     await manager.query(
-        'INSERT INTO "user" ( "firstName", "lastName", "password", email, "phoneNumber" ) VALUES ( $1, $2, $3, $4, $5 )',
-        ['Sample', 'User', hashedPassword, 'sampleuser@email.com', '081542791']
+        'INSERT INTO "user" ( "firstName", "lastName", "password", email, "phoneNumber" ) VALUES ( $1, $2, $3, $4, $5 ), ($6, $7, $8, $9, $10)',
+        [
+            'Sample',
+            'User',
+            hashedPassword,
+            'sampleuser@email.com',
+            '081542791',
+            'Sample',
+            'User',
+            hashedPassword,
+            'sampleuser2@email.com',
+            '081542791',
+        ]
     )
 
-    const result = await manager.query('SELECT *  FROM "user" LIMIT 1')
+    const result = await manager.query(
+        'SELECT *  FROM "user" WHERE "email" = $1 LIMIT 1',
+        ['sampleuser@email.com']
+    )
     const user = result[0]
 
-    const account = await manager.query(
-        'SELECT * FROM "account" WHERE "userId" = $1',
-        [user.id]
+    const result2 = await manager.query(
+        'SELECT *  FROM "user" WHERE "email" = $1 LIMIT 1',
+        ['sampleuser2@email.com']
     )
+    const user2 = result2[0]
 
     await manager.query(
         'INSERT INTO "account" ( "balance", "userId" ) VALUES ($1, $2)',
         [500, user.id]
     )
+
+    await manager.query(
+        'INSERT INTO "account" ( "balance", "userId" ) VALUES ($1, $2)',
+        [500, user2.id]
+    )
 }
 
 export async function clearDb() {
     const manager = getManager('q-wallet')
-
+    await manager.query('DELETE FROM "transaction"')
     await manager.query('DELETE FROM "account"')
     await manager.query('DELETE FROM "user"')
 }
@@ -70,4 +90,13 @@ export async function getAccessToken() {
     const user = result[0]
     const { accessToken } = await generateToken(user)
     return accessToken
+}
+
+export async function getExtraUser() {
+    const manager = getManager('q-wallet')
+    const result = await manager.query(
+        'SELECT *  FROM "user" WHERE "email" = $1 LIMIT 1',
+        ['sampleuser2@email.com']
+    )
+    return result[0]
 }
