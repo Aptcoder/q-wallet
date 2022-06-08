@@ -1,8 +1,8 @@
-import { reqWithUser } from '../../../utils/types'
-import AccountController from '../../../controllers/account.controller'
+import { reqWithUser } from '../../../src/utils/types'
+import AccountController from '../../../src/controllers/account.controller'
 import { Response } from 'express'
-import { mockAccountService } from '../../../tests/mocks/service.mocks'
-import { mockReq, mockRes } from '../../../tests/mocks/util.mocks'
+import { mockAccountService } from '../../mocks/service.mocks'
+import { mockReq, mockRes } from '../../mocks/util.mocks'
 
 describe('Account controller', () => {
     let accountController = AccountController(mockAccountService)

@@ -1,32 +1,17 @@
 import express from 'express'
 import request from 'supertest'
 import { getConnection, getManager, QueryRunner } from 'typeorm'
-import { init } from '../../loaders'
+import { init } from '../../src/loaders'
 import { faker } from '@faker-js/faker'
 import bcrypt from 'bcrypt'
+import { clearDb, seeDb } from '../fixtures/db.fixture'
 
 describe('User tests', () => {
     const app = express()
     let testUser
     beforeAll(async () => {
         await init({ expressApp: app })
-
-        const manager = getManager('q-wallet')
-
-        const hashedPassword = await bcrypt.hash('samueluser.', 10)
-
-        await manager.query('DELETE FROM "account"')
-        await manager.query('DELETE FROM "user"')
-        await manager.query(
-            'INSERT INTO "user" ( "firstName", "lastName", "password", email, "phoneNumber" ) VALUES ( $1, $2, $3, $4, $5 )',
-            [
-                'Sample',
-                'User',
-                hashedPassword,
-                'sampleuser@email.com',
-                '081542791',
-            ]
-        )
+        await seeDb()
     })
     describe('POST /users test', () => {
         it('Should return 404', async () => {
@@ -74,7 +59,9 @@ describe('User tests', () => {
                 status: 'failed',
             })
         })
+    })
 
+    describe('POST /users/auth', () => {
         it('Should auth user', async () => {
             const res = await request(app).post('/api/users/auth').send({
                 email: 'sampleuser@email.com',
@@ -116,6 +103,7 @@ describe('User tests', () => {
     })
 
     afterAll(async () => {
+        await clearDb()
         await getConnection('q-wallet').close()
     })
 })

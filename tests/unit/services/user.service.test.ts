@@ -1,7 +1,7 @@
-import { ConflictError, NotFoundError } from '../../../utils/errors'
-import User from '../../../entities/user.entity'
-import { IUserService } from '../../../utils/interfaces/services.interfaces'
-import UserService from '../../../services/user.service'
+import { ConflictError, NotFoundError } from '../../../src/utils/errors'
+import User from '../../../src/entities/user.entity'
+import { IUserService } from '../../../src/utils/interfaces/services.interfaces'
+import UserService from '../../../src/services/user.service'
 import { mockUserRepository } from '../../mocks/repo.mocks'
 
 describe('User service', () => {
@@ -21,6 +21,7 @@ describe('User service', () => {
 
     afterEach(() => {
         jest.clearAllMocks()
+        jest.restoreAllMocks()
     })
 
     it('Should create a user', async () => {
@@ -38,7 +39,7 @@ describe('User service', () => {
         expect(saveSpy).toHaveBeenCalled()
     })
 
-    it('SHould throw error on create if user with email exists', async () => {
+    it('Should throw error on create if user with email exists', async () => {
         const findByEmailSpy = jest.spyOn(mockUserRepository, 'findByEmail')
         expect(async () => {
             await userService.create({ ...sample_user })

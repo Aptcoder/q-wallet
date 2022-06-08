@@ -5,8 +5,9 @@
     "main": "app.js",
     "scripts": {
         "test": "cross-env NODE_ENV=test && jest",
-        "test:watch": "cross-env NODE_ENV=test && jest --watch",
-        "test:watch:unit": "cross-env NODE_ENV=test && jest --watch ./src/tests/unit",
+        "test:watch": "cross-env NODE_ENV=test && jest --watch ./tests/*/**",
+        "test:watch:unit": "cross-env NODE_ENV=test && jest --watch ./tests/unit",
+        "test:watch:integration": "cross-env NODE_ENV=test && jest --watch ./tests/integration",
         "build:ts": "tsc --w",
         "typeorm": "ts-node ./node_modules/typeorm/cli.js",
         "start": "ts-node ./src/server.ts",

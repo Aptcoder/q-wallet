@@ -1,15 +1,19 @@
 import { EntityManager } from 'typeorm'
-import Account from '../../../entities/account.entity'
-import { APIError, ConflictError, NotFoundError } from '../../../utils/errors'
-import { IAccountService } from '../../../utils/interfaces/services.interfaces'
-import AccountService from '../../../services/account.services'
+import Account from '../../../src/entities/account.entity'
+import {
+    APIError,
+    ConflictError,
+    NotFoundError,
+} from '../../../src/utils/errors'
+import { IAccountService } from '../../../src/utils/interfaces/services.interfaces'
+import AccountService from '../../../src/services/account.services'
 import {
     mockAccountRepository,
     mockBeneficiaryRepository,
     mockTransactionRepository,
 } from '../../mocks/repo.mocks'
 import { paymentServiceMock } from '../../mocks/service.mocks'
-import { TransactionCategory } from '../../../entities/transaction.entity'
+import { TransactionCategory } from '../../../src/entities/transaction.entity'
 
 describe('Account service', () => {
     it('A + B', () => {

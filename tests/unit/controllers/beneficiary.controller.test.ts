@@ -1,5 +1,5 @@
-import { reqWithUser } from '../../../utils/types'
-import BeneficiaryController from '../../../controllers/beneficiary.controller'
+import { reqWithUser } from '../../../src/utils/types'
+import BeneficiaryController from '../../../src/controllers/beneficiary.controller'
 import { mockBeneficiaryService } from '../../mocks/service.mocks'
 import { mockReq, mockRes } from '../../mocks/util.mocks'
 

@@ -1,13 +1,13 @@
-import { VerifyAccountDto } from '../../utils/dtos/beneficiary.dto'
-import { BankTransferDto } from '../../utils/dtos/account.dto'
+import { VerifyAccountDto } from '../../src/utils/dtos/beneficiary.dto'
+import { BankTransferDto } from '../../src/utils/dtos/account.dto'
 import {
     IAccountService,
     IBeneficiaryService,
     IPaymentService,
-} from '../../utils/interfaces/services.interfaces'
+} from '../../src/utils/interfaces/services.interfaces'
 import { EntityManager } from 'typeorm'
-import { TransactionCategory } from '../../entities/transaction.entity'
-import Account from '../../entities/account.entity'
+import { TransactionCategory } from '../../src/entities/transaction.entity'
+import Account from '../../src/entities/account.entity'
 
 export const paymentServiceMock: IPaymentService = {
     chargeWithTransfer(bankTransferDto: BankTransferDto) {

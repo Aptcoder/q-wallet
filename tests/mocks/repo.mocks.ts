@@ -1,12 +1,12 @@
-import Transaction from '../../entities/transaction.entity'
-import Account from '../../entities/account.entity'
+import Transaction from '../../src/entities/transaction.entity'
+import Account from '../../src/entities/account.entity'
 import {
     IAccountRepository,
     IBeneficiaryRepository,
     ITransactionRepository,
     IUserRepository,
-} from '../../utils/interfaces/repos.interfaces'
-import User from '../../entities/user.entity'
+} from '../../src/utils/interfaces/repos.interfaces'
+import User from '../../src/entities/user.entity'
 
 const account = new Account()
 
@@ -71,7 +71,6 @@ export const mockUserRepository: IUserRepository = {
         return user
     },
     findByEmail() {
-        console.log('called')
         return Promise.resolve(user)
     },
     save() {

@@ -1,6 +1,6 @@
-import { APIError, ConflictError } from '../../../utils/errors'
-import { IBeneficiaryService } from '../../../utils/interfaces/services.interfaces'
-import BeneficiaryService from '../../../services/beneficiary.service'
+import { APIError, ConflictError } from '../../../src/utils/errors'
+import { IBeneficiaryService } from '../../../src/utils/interfaces/services.interfaces'
+import BeneficiaryService from '../../../src/services/beneficiary.service'
 import { mockBeneficiaryRepository } from '../../mocks/repo.mocks'
 import { paymentServiceMock } from '../../mocks/service.mocks'
 
