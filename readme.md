@@ -12,8 +12,9 @@ Will be splitting this readme into two sections by assumed reason for being here
 Some basic folder structure
 
 ```
+-- config (project wide configurations)
+-- tests (all tests are here)
 -- src
----- tests (all tests are here)
 ---- controllers ( web controllers - they decide what happens with api requests )
 ---- services ( core logic )
 ---- repository ( Data access layer (or sort of). Used typeorm's custom repositories )
