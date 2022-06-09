@@ -20,6 +20,7 @@ import { BankTransferDto } from '../utils/dtos/account.dto'
 import FlutterwaveStrategy from './payment_strategies/flutterwave.strategy'
 import config from 'config'
 import PaystackStrategy from './payment_strategies/paystack.strategy'
+import { getPaymentStrategy } from '../utils/helpers'
 
 export default class AccountService implements IAccountService {
     constructor(
@@ -90,7 +91,7 @@ export default class AccountService implements IAccountService {
         bankTransferDto: BankTransferDto
     ): Promise<{}> {
         const tx_ref = randomUUID()
-        const flw_strat = new FlutterwaveStrategy(config.get('flw_secret'))
+        const flw_strat = getPaymentStrategy('FLUTTERWAVE')
         this.paymentService.setStrategy(flw_strat)
         const result = await this.paymentService.chargeWithTransfer({
             reference: tx_ref,
@@ -241,7 +242,7 @@ export default class AccountService implements IAccountService {
             throw new NotFoundError('Beneficiary not found')
         }
 
-        const pst_strat = new PaystackStrategy(config.get('pstk_secret'))
+        const pst_strat = getPaymentStrategy('PAYSTACK')
         this.paymentService.setStrategy(pst_strat)
         const result = await this.paymentService.payout({
             bank_code: beneficiary.bank_code,

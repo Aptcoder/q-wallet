@@ -1,4 +1,5 @@
 import config from 'config'
+import { getPaymentStrategy } from '../utils/helpers'
 import { VerifyAccountDto } from '../utils/dtos/beneficiary.dto'
 import { APIError, ConflictError } from '../utils/errors'
 import { IBeneficiaryRepository } from '../utils/interfaces/repos.interfaces'
@@ -29,7 +30,7 @@ export default class BeneficiaryService implements IBeneficiaryService {
         if (oldBeneficiary) {
             throw new ConflictError('Beneficiary already exists')
         }
-        const pst_strat = new PaystackStrategy(config.get('pstk_secret'))
+        const pst_strat = getPaymentStrategy('PAYSTACK')
         this.paymentService.setStrategy(pst_strat)
         const result = await this.paymentService.verifyAccount(verifyAccountDto)
         if (!result.success) {
