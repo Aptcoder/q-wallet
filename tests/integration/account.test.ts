@@ -20,12 +20,11 @@ describe('Account tests', () => {
     beforeAll(async () => {
         await init({ expressApp: app })
 
-        const manager = getManager('q-wallet')
-        await seeDb()
-
         accessToken = await getAccessToken()
         extraUser = await getExtraUser()
     })
+
+    describe('POST /account/withdraw', () => {})
 
     describe('GET /account/balance test', () => {
         it('Should return balance of an account', async () => {
@@ -50,7 +49,9 @@ describe('Account tests', () => {
 
             expect(res.status).toBe(403)
         })
+    })
 
+    describe('POST /account/transfer', () => {
         it('Should tranfer from account to another', async () => {
             const res = await request(app)
                 .post('/api/account/transfer')
@@ -105,7 +106,6 @@ describe('Account tests', () => {
     })
 
     afterAll(async () => {
-        await clearDb()
         await getConnection('q-wallet').close()
     })
 })

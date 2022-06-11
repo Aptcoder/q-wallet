@@ -21,14 +21,19 @@ import FlutterwaveStrategy from './payment_strategies/flutterwave.strategy'
 import config from 'config'
 import PaystackStrategy from './payment_strategies/paystack.strategy'
 import { getPaymentStrategy } from '../utils/helpers'
+// import BaseApiService from './base.api.service'
 
-export default class AccountService implements IAccountService {
+export default class AccountService
+    // extends BaseApiService
+    implements IAccountService
+{
     constructor(
         private accountRepository: IAccountRepository,
         private transactionRepository: ITransactionRepository,
         private paymentService: IPaymentService,
         private beneficiaryRepository: IBeneficiaryRepository
     ) {
+        // super()
         this.accountRepository = accountRepository
         this.transactionRepository = transactionRepository
         this.paymentService = paymentService

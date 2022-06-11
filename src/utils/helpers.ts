@@ -1,15 +1,16 @@
 /* eslint-disable import/prefer-default-export */
 import config from 'config'
 import { Response } from 'express'
+import RedisService from '../services/cache_services/redis.service'
 import FlutterwaveStrategy from '../services/payment_strategies/flutterwave.strategy'
 import PaystackStrategy from '../services/payment_strategies/paystack.strategy'
 import TestStrategy from '../services/payment_strategies/test.strategy'
-import { IPaymentStrategy } from './interfaces/services.interfaces'
-
-// type errorType = ServiceError | Error
+import {
+    ICacheService,
+    IPaymentStrategy,
+} from './interfaces/services.interfaces'
 
 export const processError = (res: Response, error: any) => {
-    // console.log('err', error)
     if (error.status) {
         return res.status(error.status).send({
             status: 'failed',
@@ -42,3 +43,8 @@ export const getPaymentStrategy = (strategytype: string): IPaymentStrategy => {
     const pstk_strat = new PaystackStrategy(config.get('pstk_secret'))
     return pstk_strat
 }
+
+// export const getCacheService = (cacheService: string): ICacheService => {
+
+//   const redisService = new RedisService()
+// }

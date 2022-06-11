@@ -44,6 +44,7 @@ export default class BeneficiaryRepository
     }
 
     async findOneWithUserIdAndAccount(userId: string, account_number: string) {
+        console.log('sera', userId, account_number)
         const beneficiary = await this.findOne({
             where: {
                 userId,

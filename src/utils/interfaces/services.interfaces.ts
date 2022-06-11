@@ -94,3 +94,8 @@ export interface IBeneficiaryService {
 
     getBeneficiaries(userId: string): Promise<any[]>
 }
+
+export interface ICacheService {
+    setEx(key: string, value: string, exp: string): string
+    get(key: string): string
+}

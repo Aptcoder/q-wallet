@@ -14,7 +14,7 @@ export default class AccountRepository
                 .createQueryBuilder(Account, 'account')
                 .where({ userId: userId })
             if (lock) {
-                query = query.setLock('pessimistic_read')
+                query = query.setLock('pessimistic_write').useTransaction(true)
             }
         } else {
             query = this.createQueryBuilder().where({

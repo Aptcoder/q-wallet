@@ -2,6 +2,7 @@ import { getManager } from 'typeorm'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import config from 'config'
+import { randomUUID } from 'crypto'
 
 export async function seeDb() {
     const manager = getManager('q-wallet')
@@ -45,10 +46,16 @@ export async function seeDb() {
         'INSERT INTO "account" ( "balance", "userId" ) VALUES ($1, $2)',
         [500, user2.id]
     )
+
+    await manager.query(
+        'INSERT INTO "beneficiary" ("userId", "bank_account", "account_name", "bank_code", "id" ) VALUES ( $1, $2, $3, $4, $5)',
+        [user.id, '0893456719', 'Sample account', '004', randomUUID()]
+    )
 }
 
 export async function clearDb() {
     const manager = getManager('q-wallet')
+    await manager.query('DELETE FROM "beneficiary"')
     await manager.query('DELETE FROM "transaction"')
     await manager.query('DELETE FROM "account"')
     await manager.query('DELETE FROM "user"')
@@ -86,7 +93,10 @@ function generateToken(user: {
 
 export async function getAccessToken() {
     const manager = getManager('q-wallet')
-    const result = await manager.query('SELECT *  FROM "user" LIMIT 1')
+    const result = await manager.query(
+        'SELECT *  FROM "user" WHERE "email" = $1 LIMIT 1',
+        ['sampleuser@email.com']
+    )
     const user = result[0]
     const { accessToken } = await generateToken(user)
     return accessToken

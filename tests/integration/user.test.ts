@@ -11,7 +11,6 @@ describe('User tests', () => {
     let testUser
     beforeAll(async () => {
         await init({ expressApp: app })
-        await seeDb()
     })
     describe('POST /users test', () => {
         it('Should return 404', async () => {
@@ -103,7 +102,6 @@ describe('User tests', () => {
     })
 
     afterAll(async () => {
-        await clearDb()
         await getConnection('q-wallet').close()
     })
 })
