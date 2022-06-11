@@ -6,8 +6,8 @@ A sample (really lite) fintech wallet. Built this project to play around with so
 
 Will be splitting this readme into two sections by assumed reason for being here.
 
--   If you are reading this cos you are looking to use this API with a client service(mobile/front end) go here [->]()
--   If you are just looking around. Please remember to give a star if you think it's worth it. Start here [->]()
+-   If you are reading this cos you are looking to use this API with a client service(mobile/front end) go here [->](#some-basic-folder-structure)
+-   If you are just looking around. Please remember to give a star if you think it's worth it. Start here [->](#api-documentation)
 
 #### Some basic folder structure
 
