@@ -49,6 +49,13 @@ This is solved using a persimistic lock in the database. This tells the database
 
 5. Switching payment service providers without changing my payment service interface. Used the strategy technique here mostly, and some kind of factory for the strategies that ensures a test strategy is used when testing. You can check this out in src/services/payment.service.ts and src/services/payment_strategies.
 
+#### Todo
+
+[] Dockerize app
+[] CI/CD ?
+[] Add cache service and use for handling duplicate transactions
+[] logging ?
+
 #### API Documentation
 
 Documentation is still a WIP and can be found here: https://documenter.getpostman.com/view/11384363/Uz5GpGGp
