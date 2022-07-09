@@ -14,7 +14,6 @@
         "build": "tsc",
         "typeorm": "ts-node ./node_modules/typeorm/cli.js",
         "migrate": "npm run typeorm -- migration:run",
-        "postinstall": "npm run build",
         "start": "node ./dist/src/server.js",
         "start:dev": "nodemon --watch src -e ts,json  --exec ts-node ./src/server.ts"
     },
