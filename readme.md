@@ -51,10 +51,13 @@ This is solved using a persimistic lock in the database. This tells the database
 
 #### Todo
 
-[] Dockerize app
-[] CI/CD ?
-[] Add cache service and use for handling duplicate transactions
-[] logging ?
+[ ] Dockerize app
+
+[ ] CI/CD ?
+
+[ ] Add cache service and use for handling duplicate transactions
+
+[ ] logging ?
 
 #### API Documentation
 
