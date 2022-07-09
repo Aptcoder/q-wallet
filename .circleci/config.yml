@@ -21,6 +21,14 @@ jobs:
     test:
         docker:
             - image: circleci/node:13.8.0
+              environment:
+                  DB_PASSWORD: wonderful.
+
+            - image: circleci/postgres:9.6
+              environment:
+                  POSTGRES_USER: postgres
+                  POSTGRES_DB: q-wallet-test
+                  POSTGRES_PASSWORD: wonderful.
         steps:
             - checkout
             - run:
