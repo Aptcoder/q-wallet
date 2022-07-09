@@ -5,6 +5,19 @@ orbs:
     heroku: circleci/heroku@1.2.6
 
 jobs:
+    build:
+        docker:
+            - image: circleci/node:13.8.0
+        steps:
+            - checkout
+            - run:
+                  name: Build front-end
+                  command: |
+                      npm install
+                      npm run build
+            - save_cache:
+                  paths: [./node_modules]
+                  key: build
     test:
         docker:
             - image: circleci/node:13.8.0
@@ -35,7 +48,9 @@ jobs:
 workflows:
     test_and_deploy:
         jobs:
-            - test
+            - build
+            - test:
+                  requires: [build]
             - deploy:
                   requires: [test]
                   filters:

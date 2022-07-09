@@ -4,16 +4,19 @@
     "description": "A wallet app for practice",
     "main": "app.js",
     "scripts": {
-        "test": "cross-env NODE_ENV=test && jest",
+        "test": "cross-env NODE_ENV=test && jest ./dist/tests",
         "test:unit": "cross-env NODE_ENV=test && jest ./tests/unit",
         "test:integration": "cross-env NODE_ENV=test && jest ./tests/integration",
         "test:watch": "cross-env NODE_ENV=test && jest --watch ./tests/*/**",
         "test:watch:unit": "cross-env NODE_ENV=test && jest --watch ./tests/unit",
         "test:watch:integration": "cross-env NODE_ENV=test && jest --watch ./tests/integration",
-        "build:ts": "tsc --w",
+        "build:watch": "tsc --w",
+        "build": "tsc",
         "typeorm": "ts-node ./node_modules/typeorm/cli.js",
-        "start": "ts-node ./src/server.ts",
-        "start:dev": "nodemon --watch src -e ts,json  --exec npm run start"
+        "migrate": "npm run typeorm -- migration:run",
+        "postinstall": "npm run build",
+        "start": "node ./dist/src/server.js",
+        "start:dev": "nodemon --watch src -e ts,json  --exec ts-node ./src/server.ts"
     },
     "author": "milz",
     "license": "ISC",
@@ -31,7 +34,8 @@
         "eslint": "^8.4.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-plugin-import": "^2.25.3",
-        "ts-node": "^10.7.0"
+        "ts-node": "^10.7.0",
+        "typescript": "^4.7.4"
     },
     "dependencies": {
         "@types/bcrypt": "^5.0.0",
