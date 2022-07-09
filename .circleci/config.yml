@@ -7,17 +7,25 @@ orbs:
 jobs:
     build:
         docker:
-            - image: circleci/node:13.8.0
+            - image: circleci/node:16.13.1
         steps:
             - checkout
+            - run:
+                  name: Check files
+                  command: |
+                      ls
             - run:
                   name: Build front-end
                   command: |
                       npm install
                       npm run build
             - save_cache:
-                  paths: [./node_modules]
+                  paths: [node_modules]
                   key: build
+            - persist_to_workspace:
+                  root: ~/
+                  paths:
+                      - project/dist
     test:
         docker:
             - image: circleci/node:16.13.1
@@ -31,21 +39,27 @@ jobs:
                   POSTGRES_PASSWORD: wonderful.
         steps:
             - checkout
+            - restore_cache:
+                  keys: [build]
             - run:
                   name: Run unit tests
                   command: |
-                      npm install
                       npm run test:unit
             - run:
                   name: Run integration tests
                   command: |
-                      npm install
                       npm run test:integration
 
     deploy:
         executor: heroku/default
         steps:
             - checkout
+            - attach_workspace:
+                  at: ~/
+            - run:
+                  name: Check files
+                  command: |
+                      ls
             - heroku/install
             - run:
                   command: >
