@@ -20,7 +20,7 @@ jobs:
                   key: build
     test:
         docker:
-            - image: circleci/node:13.8.0
+            - image: circleci/node:16.13.1
               environment:
                   DB_PASSWORD: wonderful.
 
