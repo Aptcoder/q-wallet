@@ -1,3 +1,5 @@
+[![Aptcoder](https://circleci.com/gh/Aptcoder/q-wallet.svg?style=svg)]
+
 ### Readme is a WIP
 
 ## Q-wallet (or some other random name actually)
@@ -53,7 +55,7 @@ This is solved using a persimistic lock in the database. This tells the database
 
 [ ] Dockerize app
 
-[ ] CI/CD ?
+[✔] CI/CD ?
 
 [ ] Add cache service and use for handling duplicate transactions
 
