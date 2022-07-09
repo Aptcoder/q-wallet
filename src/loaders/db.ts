@@ -8,11 +8,12 @@ export default (): Promise<void | Connection> =>
     createConnection({
         name: 'q-wallet',
         type: 'postgres',
-        host: config.get<string>('dbHost'),
-        port: 5432,
-        username: config.get<string>('dbUsername'),
-        password: config.get<string>('dbPassword'),
-        database: config.get<string>('dbName'),
+        url: config.get<string>('dbUri'),
+        // host: config.get<string>('dbHost'),
+        // port: 5432,
+        // username: config.get<string>('dbUsername'),
+        // password: config.get<string>('dbPassword'),
+        // database: config.get<string>('dbName'),
         entities: [`${entityPath}/*.{js,ts}`],
         synchronize: config.get<boolean>('dbSync'),
     })
