@@ -39,4 +39,5 @@ workflows:
             - deploy:
                   filters:
                       branches:
-                          - main
+                          only:
+                              - main
