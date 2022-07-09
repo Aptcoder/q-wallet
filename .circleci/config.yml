@@ -15,7 +15,7 @@ jobs:
                   command: |
                       ls
             - run:
-                  name: Build front-end
+                  name: Build application
                   command: |
                       npm install
                       npm run build
