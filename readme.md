@@ -1,4 +1,4 @@
-[![Aptcoder](https://circleci.com/gh/Aptcoder/q-wallet.svg?style=svg)]
+[![Aptcoder](https://circleci.com/gh/Aptcoder/q-wallet.svg?style=shield)](https://app.circleci.com/pipelines/github/Aptcoder/q-wallet)
 
 ### Readme is a WIP
 
